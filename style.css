@@ -1,0 +1,138 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Full page layout */
+body, html {
+  height: 100%;
+  background-color: #4d96ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Centered login box */
+.login-box {
+  background-color: #fff;
+  width: 450px;
+  padding: 50px;
+  border-radius: 20px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Title */
+h2 {
+  text-align: center;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 10px;
+}
+
+/* Subtitle */
+.subtitle {
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 25px;
+}
+
+/* Labels and input */
+label {
+  display: block;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: #f7f7f7;
+  font-size: 14px;
+  margin-bottom: 18px;
+  transition: border-color 0.3s ease;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: #4d96ff;
+  outline: none;
+  background-color: #fff;
+}
+
+/* Forgot password link */
+.password-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.forgot {
+  font-size: 13px;
+  text-decoration: none;
+  color: #4d96ff;
+}
+
+.forgot:hover {
+  text-decoration: underline;
+}
+
+/* Remember checkbox */
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #444;
+}
+
+/* Sign In button */
+button {
+  width: 100%;
+  background-color: #4d96ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #3c7eea;
+}
+
+/* Signup text */
+.signup {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #333;
+}
+
+.signup a {
+  color: #4d96ff;
+  text-decoration: none;
+}
+
+.signup a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 420px) {
+  .login-box {
+    width: 90%;
+    padding: 25px;
+  }
+}
