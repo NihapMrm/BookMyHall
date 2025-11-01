@@ -91,7 +91,7 @@
 				</a>
 			</li>
 			<li>
-				<a class="sidebar__link" href="#">
+				<a class="sidebar__link" href="logout.php">
 					<span class="sidebar__icon">
 						<i class="fa-solid fa-arrow-right-from-bracket"></i>
 					</span>
