@@ -1,0 +1,217 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* ─── Variables ─────────────────────────────────────────────────────────────── */
+:root {
+    --primary:       #4d5dfb;
+    --primary-light: #eef1ff;
+    --text-main:     #1f1d2b;
+    --text-muted:    #6c6f83;
+    --bg-page:       #f5f7fd;
+    --card-bg:       #ffffff;
+    --border:        #eaedf7;
+    --success:       #2ecc71;
+    --danger:        #e74c3c;
+    --warning:       #f39c12;
+    --shadow:        0 4px 24px rgba(112, 144, 176, 0.12);
+    --radius-lg:     20px;
+    --radius-md:     14px;
+    --radius-sm:     10px;
+    --nav-height:    68px;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, sans-serif;
+    background: var(--bg-page);
+    color: var(--text-main);
+    min-height: 100vh;
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+/* ─── Navbar ─────────────────────────────────────────────────────────────────── */
+.navbar {
+    position: sticky;
+    top: 0;
+    height: var(--nav-height);
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,.05);
+}
+
+.navbar__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.navbar__brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.navbar__links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar__links a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: background .2s, color .2s;
+}
+
+.navbar__links a:hover { background: var(--primary-light); color: var(--primary); }
+.navbar__links a.is-active { background: var(--primary); color: #fff; }
+
+.navbar__actions { display: flex; align-items: center; gap: 10px; }
+
+/* ─── Content wrapper ────────────────────────────────────────────────────────── */
+.customer-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 36px 24px 60px;
+}
+
+/* ─── Cards ──────────────────────────────────────────────────────────────────── */
+.card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 24px;
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────────────────── */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    transition: background .2s, box-shadow .2s;
+    font-family: inherit;
+    text-decoration: none;
+}
+
+.btn-primary  { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: #3a4be0; box-shadow: 0 6px 18px rgba(77,93,251,.3); }
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    padding: 8px 20px;
+}
+.btn-outline:hover { background: var(--primary-light); }
+
+.btn-danger  { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #c0392b; }
+
+.btn-sm { padding: 6px 14px; font-size: 13px; border-radius: 8px; }
+.btn-full { width: 100%; justify-content: center; }
+
+/* ─── Alerts ─────────────────────────────────────────────────────────────────── */
+.alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.alert-success { background: rgba(46,204,113,.12); color: #1e8449; border-left: 4px solid var(--success); }
+.alert-error   { background: rgba(231,76,60,.12);  color: #c0392b; border-left: 4px solid var(--danger); }
+.alert-info    { background: rgba(77,93,251,.10);  color: #3a4be0; border-left: 4px solid var(--primary); }
+
+/* ─── Forms ──────────────────────────────────────────────────────────────────── */
+.form-group { margin-bottom: 18px; }
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg-page);
+    font-size: 14px;
+    color: var(--text-main);
+    font-family: inherit;
+    transition: border-color .2s;
+    outline: none;
+}
+
+.form-control:focus { border-color: var(--primary); background: #fff; }
+.form-control::placeholder { color: #adb0bd; }
+
+/* ─── Status badges ──────────────────────────────────────────────────────────── */
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-pending   { background: rgba(243,156,18,.15); color: #d68910; }
+.badge-approved  { background: rgba(46,204,113,.15);  color: #1e8449; }
+.badge-rejected  { background: rgba(231,76,60,.15);   color: #c0392b; }
+.badge-cancelled { background: rgba(108,111,131,.15); color: #555; }
+.badge-completed { background: rgba(52,152,219,.15);  color: #2874a6; }
+
+/* ─── Footer ──────────────────────────────────────────────────────────────────── */
+.site-footer {
+    background: var(--text-main);
+    color: rgba(255,255,255,.6);
+    text-align: center;
+    padding: 24px;
+    font-size: 13px;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .navbar { padding: 0 20px; }
+    .navbar__links { display: none; }
+    .customer-content { padding: 24px 16px 48px; }
+}
