@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // ─── Active nav highlight (matches current pathname) ──────────────────────────
 (function () {
     const path = window.location.pathname;
-    document.querySelectorAll('.sidebar__link, .navbar__links a').forEach(function (link) {
+    document.querySelectorAll('.sidebar__link').forEach(function (link) {
         if (link.getAttribute('href') && path.includes(link.getAttribute('href'))) {
             link.classList.add('is-active');
         }
