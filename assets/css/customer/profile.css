@@ -1,0 +1,252 @@
+/* ─── profile.css — Customer Profile Page Styles ─────────────────────────── */
+
+/* ── Profile Layout ──────────────────────────────────────────────────────── */
+.profile-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* ── Profile Card (left column) ──────────────────────────────────────────── */
+.profile-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 32px 24px;
+    text-align: center;
+}
+
+.profile-avatar-wrap {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 18px;
+}
+
+.profile-avatar {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 34px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.profile-avatar img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.profile-name {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.profile-role-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-light);
+    border-radius: 20px;
+    padding: 3px 12px;
+    margin-bottom: 20px;
+}
+
+.profile-detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    text-align: left;
+    word-break: break-word;
+}
+
+.profile-detail-row i {
+    color: var(--primary);
+    width: 16px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.profile-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+}
+
+.profile-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ── Forms Panel (right column) ──────────────────────────────────────────── */
+.profile-forms-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.profile-section-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 28px;
+}
+
+.profile-section-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-main);
+}
+
+.profile-section-title i {
+    color: var(--primary);
+    font-size: 16px;
+}
+
+/* ── Avatar Upload ───────────────────────────────────────────────────────── */
+.avatar-upload-area {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 20px;
+    background: #f8f9fe;
+    border-radius: var(--radius-md);
+    border: 1.5px dashed #c5cbf5;
+    margin-bottom: 24px;
+}
+
+.avatar-upload-preview {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 24px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.avatar-upload-preview img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.avatar-upload-info p {
+    margin: 0 0 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* ── Stats Row (on view profile page) ───────────────────────────────────── */
+.profile-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.profile-stat-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+    text-align: center;
+}
+
+.profile-stat-card .ps-val {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+}
+
+.profile-stat-card .ps-lbl {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* ── Recent Bookings on Profile ──────────────────────────────────────────── */
+.profile-recent-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.profile-recent-card .prc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.profile-recent-card .prc-header h3 {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-main);
+}
+
+.profile-recent-card .prc-header h3 i { color: var(--primary); }
+
+/* ── Password strength indicator ─────────────────────────────────────────── */
+.pwd-strength-bar {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.pwd-strength-bar span {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: #e3e7f7;
+    transition: background .2s;
+}
+
+.pwd-strength-bar.weak span:nth-child(1)   { background: var(--danger); }
+.pwd-strength-bar.fair span:nth-child(-n+2) { background: var(--warning); }
+.pwd-strength-bar.good span:nth-child(-n+3) { background: var(--primary); }
+.pwd-strength-bar.strong span              { background: var(--success); }
+
+.pwd-strength-label {
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 960px) {
+    .profile-layout        { grid-template-columns: 1fr; }
+    .profile-stats-row     { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 560px) {
+    .profile-stats-row     { grid-template-columns: 1fr; }
+    .avatar-upload-area    { flex-direction: column; text-align: center; }
+}

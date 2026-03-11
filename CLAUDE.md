@@ -10,10 +10,10 @@
 | Setting | Value |
 |---|---|
 | Server | Laragon (Apache + PHP 8.x + MySQL 8.x) |
-| DB host | `localhost` |
+| DB host | `localhost:3308` |
 | DB name | `bookmyhall` |
 | DB user | `root` |
-| DB pass | `root` (not empty string) |
+| DB pass | ``  |
 | `BASE_URL` | `/BookMyHall` |
 | `SITE_NAME` | `BookMyHall` |
 | Timezone | `Asia/Colombo` |
@@ -29,8 +29,8 @@
 |---|---|---|
 | 1 – Auth & Admin Dashboard | Sahani | ✅ Complete |
 | 2 – Hall & Package Management | Riffna | ✅ Complete |
-| 3 – Customer Management | Nishtha | 🔜 Next |
-| 4 – Booking & Feedback | Afrina | 🔜 Pending |
+| 3 – Customer Management | Nishtha | ✅ Complete |
+| 4 – Booking & Feedback | Afrina | 🔜 Next |
 | 5 – Payment & Reports | Nihap | 🔜 Pending |
 
 ---
@@ -458,4 +458,4 @@ Before writing any code for a new module:
 
 ---
 
-*Last updated: Module 2 complete. Next: Module 3 – Customer Management (Nishtha).*
+*Last updated: Module 3 complete. Next: Module 4 – Booking & Feedback (Afrina).*
