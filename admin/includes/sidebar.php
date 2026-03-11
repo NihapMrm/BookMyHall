@@ -38,7 +38,7 @@ function sidebarLink(string $href, string $icon, string $label, string $currentP
             <?= sidebarLink(BASE_URL . '/admin/hall/manage_hall.php',    'fa-solid fa-building',      'Hall',       $currentPage, ['manage_hall.php','edit_hall.php','manage_images.php']) ?>
             <?= sidebarLink(BASE_URL . '/admin/packages/manage_packages.php', 'fa-solid fa-box-open', 'Packages',  $currentPage, ['manage_packages.php','add_package.php','edit_package.php']) ?>
             <?= sidebarLink(BASE_URL . '/admin/bookings/manage_bookings.php', 'fa-solid fa-calendar-check', 'Bookings', $currentPage, ['manage_bookings.php','booking_details.php','add_booking.php']) ?>
-            <?= sidebarLink(BASE_URL . '/admin/customers/manage_customers.php', 'fa-solid fa-users', 'Customers', $currentPage, ['manage_customers.php','customer_details.php']) ?>
+            <?= sidebarLink(BASE_URL . '/admin/customers/manage_customers.php', 'fa-solid fa-users', 'Customers', $currentPage, ['manage_customers.php','customer_details.php','block_customer.php']) ?>
             <?= sidebarLink(BASE_URL . '/admin/feedback/manage_feedback.php', 'fa-solid fa-comments', 'Feedback',  $currentPage, ['manage_feedback.php','view_feedback.php']) ?>
         </ul>
 

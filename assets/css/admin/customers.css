@@ -1,0 +1,383 @@
+/* ─── customers.css — Admin Customer Management Styles ───────────────────── */
+
+/* ── Summary Stats Bar ───────────────────────────────────────────────────── */
+.cust-stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.cust-stat-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    padding: 20px 22px;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.cust-stat-card .cs-icon {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.cs-icon.blue   { background: #eef1ff; color: var(--primary); }
+.cs-icon.green  { background: #e8f8f0; color: #1a9a5c; }
+.cs-icon.orange { background: #fff8e6; color: #b7770d; }
+.cs-icon.red    { background: #fdf3f3; color: #c0392b; }
+
+.cust-stat-card .cs-info .cs-val {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.cust-stat-card .cs-info .cs-lbl {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 3px;
+}
+
+/* ── Filter / Search Bar ─────────────────────────────────────────────────── */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.filter-bar .search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 220px;
+}
+
+.filter-bar .search-wrap i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.filter-bar .search-wrap input {
+    width: 100%;
+    padding: 9px 14px 9px 38px;
+    border: 1.5px solid #e3e7f7;
+    border-radius: var(--radius-sm);
+    font-size: 13.5px;
+    font-family: inherit;
+    background: var(--card-bg);
+    color: var(--text-main);
+    transition: border-color .15s;
+}
+
+.filter-bar .search-wrap input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.filter-bar select {
+    padding: 9px 14px;
+    border: 1.5px solid #e3e7f7;
+    border-radius: var(--radius-sm);
+    font-size: 13.5px;
+    font-family: inherit;
+    background: var(--card-bg);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: border-color .15s;
+}
+
+.filter-bar select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* ── Customer Table ──────────────────────────────────────────────────────── */
+.cust-table-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.cust-table-card .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid #eaedf7;
+}
+
+.cust-table-card .card-header h2 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.cust-table-card .card-header span {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.cust-cell-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cust-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    text-transform: uppercase;
+}
+
+.cust-avatar img {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.cust-cell-user .cu-name {
+    font-weight: 600;
+    font-size: 13.5px;
+    line-height: 1.3;
+}
+
+.cust-cell-user .cu-email {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-top: 1px solid #eaedf7;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.pagination-links {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.pagination-links a,
+.pagination-links span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--text-main);
+    border: 1.5px solid #e3e7f7;
+    transition: all .15s;
+}
+
+.pagination-links a:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.pagination-links span.current {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+.pagination-links span.ellipsis {
+    border: none;
+    width: auto;
+    padding: 0 4px;
+    color: var(--text-muted);
+}
+
+/* ── Customer Detail Page ────────────────────────────────────────────────── */
+.cdetail-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.cdetail-profile-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 32px 24px;
+    text-align: center;
+}
+
+.cdetail-avatar {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 30px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    overflow: hidden;
+}
+
+.cdetail-avatar img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.cdetail-name {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.cdetail-since {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0 0 20px;
+}
+
+.cdetail-info-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.cdetail-info-row i {
+    color: var(--primary);
+    width: 16px;
+    flex-shrink: 0;
+}
+
+.cdetail-divider {
+    border: none;
+    border-top: 1px solid #eaedf7;
+    margin: 20px 0;
+}
+
+.cdetail-right {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.cdetail-mini-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.cdetail-mini-stat {
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    padding: 18px 20px;
+    text-align: center;
+}
+
+.cdetail-mini-stat .ms-val {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+}
+
+.cdetail-mini-stat .ms-lbl {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.cdetail-section-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.cdetail-section-card .cds-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid #eaedf7;
+}
+
+.cdetail-section-card .cds-header h3 {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cdetail-section-card .cds-header h3 i { color: var(--primary); }
+
+/* ── Block / Unblock Banner ──────────────────────────────────────────────── */
+.status-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: var(--radius-md);
+    margin-bottom: 0;
+}
+
+.status-banner.blocked {
+    background: #fdf3f3;
+    border: 1px solid #f5c6c6;
+    color: #c0392b;
+}
+
+.status-banner.active {
+    background: #e8f8f0;
+    border: 1px solid #b2e8cc;
+    color: #1a9a5c;
+}
+
+.status-banner p { margin: 0; font-size: 13px; }
+
+@media (max-width: 1100px) {
+    .cdetail-layout { grid-template-columns: 1fr; }
+    .cdetail-mini-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+    .cust-stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .cdetail-mini-stats { grid-template-columns: 1fr; }
+}
