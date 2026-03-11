@@ -1,0 +1,347 @@
+/* ─── hall.css — Admin Hall Management Styles ─────────────────────────────── */
+
+/* ── Hall Detail Card ─────────────────────────────────────────────────────── */
+.hall-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 8px;
+}
+
+.hall-info-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 28px 28px;
+    box-shadow: var(--shadow-card);
+}
+
+.hall-info-card h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    margin: 0 0 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eaedf7;
+}
+
+/* ── Hall Status Bar ─────────────────────────────────────────────────────── */
+.hall-status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    padding: 18px 24px;
+    box-shadow: var(--shadow-card);
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.hall-status-bar .hall-title {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.hall-status-bar .hall-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 14px;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+}
+
+.hall-status-bar .hall-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ── Detail Rows ─────────────────────────────────────────────────────────── */
+.detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f2f4fb;
+    font-size: 14px;
+}
+
+.detail-row:last-child { border-bottom: none; }
+
+.detail-row .dr-label {
+    min-width: 130px;
+    color: var(--text-muted);
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.detail-row .dr-value {
+    font-weight: 500;
+    color: var(--text-main);
+    word-break: break-word;
+}
+
+/* ── Amenity Badges ──────────────────────────────────────────────────────── */
+.amenity-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.amenity-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 999px;
+}
+
+.amenity-badge.disabled {
+    background: #f5f7fd;
+    color: #bbb;
+}
+
+/* ── Hall Status Badge ───────────────────────────────────────────────────── */
+.hall-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 999px;
+    text-transform: capitalize;
+}
+
+.hall-status-badge.available    { background: #e8f8f0; color: #1a9a5c; }
+.hall-status-badge.unavailable  { background: #fdf3f3; color: #c0392b; }
+.hall-status-badge.maintenance  { background: #fff8e6; color: #b7770d; }
+
+/* ── Edit Hall Form ──────────────────────────────────────────────────────── */
+.edit-hall-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 32px 32px;
+    box-shadow: var(--shadow-card);
+}
+
+.edit-hall-card .section-divider {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--primary);
+    padding: 20px 0 8px;
+    margin-top: 20px;
+    border-top: 1px solid #eaedf7;
+}
+
+/* ── Checkbox Grid (Amenities) ───────────────────────────────────────────── */
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #f8f9fe;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background .15s;
+    user-select: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.checkbox-item:hover { background: var(--primary-light); }
+
+.checkbox-item input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.checkbox-item input:checked + span { color: var(--primary); font-weight: 600; }
+
+/* ── Image Grid ──────────────────────────────────────────────────────────── */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.image-thumb {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    background: #eef1ff;
+    box-shadow: 0 2px 12px rgba(112,144,176,.12);
+    cursor: grab;
+}
+
+.image-thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: var(--radius-md);
+    transition: transform .2s;
+}
+
+.image-thumb:hover img { transform: scale(1.04); }
+
+.image-thumb .img-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    opacity: 0;
+    transition: opacity .2s;
+    border-radius: var(--radius-md);
+}
+
+.image-thumb:hover .img-overlay { opacity: 1; }
+
+.img-overlay button {
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.5);
+    color: #fff;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background .15s;
+}
+
+.img-overlay button:hover { background: rgba(255,255,255,.3); }
+.img-overlay .btn-delete-img { border-color: #e74c3c88; }
+.img-overlay .btn-delete-img:hover { background: #e74c3c; }
+
+.img-sort-badge {
+    position: absolute;
+    top: 8px; left: 8px;
+    background: rgba(0,0,0,.55);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+/* ── Upload Drop Zone ────────────────────────────────────────────────────── */
+.upload-zone {
+    border: 2px dashed #c9d0fd;
+    border-radius: var(--radius-md);
+    background: var(--primary-light);
+    padding: 40px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative;
+}
+
+.upload-zone:hover,
+.upload-zone.drag-over {
+    border-color: var(--primary);
+    background: #e8ebff;
+}
+
+.upload-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+
+.upload-zone i { font-size: 36px; color: var(--primary); margin-bottom: 10px; }
+.upload-zone p { font-size: 14px; color: var(--text-muted); margin: 0; }
+.upload-zone strong { color: var(--primary); }
+
+/* ── Upload Preview Strip ────────────────────────────────────────────────── */
+.preview-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.preview-item {
+    position: relative;
+    width: 90px; height: 90px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #eef1ff;
+}
+
+.preview-item img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+}
+
+.preview-item .remove-preview {
+    position: absolute;
+    top: 4px; right: 4px;
+    background: rgba(231,76,60,.85);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 20px; height: 20px;
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Empty Hall State ────────────────────────────────────────────────────── */
+.hall-empty-state {
+    text-align: center;
+    padding: 60px 30px;
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+
+.hall-empty-state i {
+    font-size: 56px;
+    color: #c9d0fd;
+    margin-bottom: 16px;
+}
+
+.hall-empty-state h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 8px;
+}
+
+.hall-empty-state p {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: 0 0 24px;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .hall-detail-grid { grid-template-columns: 1fr; }
+    .checkbox-grid { grid-template-columns: repeat(2, 1fr); }
+}

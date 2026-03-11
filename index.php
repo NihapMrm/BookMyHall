@@ -158,10 +158,15 @@ $isAdmin      = isset($_SESSION['admin_id']) && ($_SESSION['role'] ?? '') === 'a
 </head>
 <body>
 
-<!-- â”€â”€ Navbar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-<?php include __DIR__ . '/customer/includes/navbar.php'; ?>
+<?php include __DIR__ . '/customer/includes/customer_sidebar.php'; ?>
+<?php
+$pageTitle    = 'Welcome';
+$pageSubtitle = 'Lee Maridean Banquet Hall';
+include __DIR__ . '/customer/includes/customer_topbar.php';
+?>
 
-<!-- â”€â”€ Hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<div class="c-content-wrapper">
+
 <section class="hero">
     <div class="hero-content">
         <div class="hero-badge">
@@ -296,5 +301,6 @@ $isAdmin      = isset($_SESSION['admin_id']) && ($_SESSION['role'] ?? '') === 'a
 
 <script src="<?= BASE_URL ?>/assets/js/main.js"></script>
 
+</div><!-- /.c-content-wrapper -->
 </body>
 </html>

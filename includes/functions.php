@@ -154,3 +154,48 @@ function logActivity(PDO $pdo, string $action, int $userId): void
     // Will be wired to an `activity_log` table in Phase 4
     error_log("[Activity] user={$userId} action={$action}");
 }
+
+// ─── Package helpers ─────────────────────────────────────────────────────────
+
+/**
+ * Fetch all active packages for a hall, grouped by main → sub-packages.
+ * Used by: booking form (Afrina, Module 4) and customer packages page (Riffna, Module 2).
+ *
+ * @return array  Array of main-package rows, each with a 'sub_packages' key
+ *                containing its active children. Services are decoded to an array
+ *                at 'services_arr' on each sub-package row.
+ */
+function getPackagesByHall(PDO $pdo, int $hallId): array
+{
+    $mainStmt = $pdo->prepare(
+        "SELECT * FROM packages
+         WHERE hall_id = ? AND type = 'main' AND is_active = 1
+         ORDER BY package_id ASC"
+    );
+    $mainStmt->execute([$hallId]);
+    $mains = $mainStmt->fetchAll();
+
+    $result = [];
+    foreach ($mains as $main) {
+        $subStmt = $pdo->prepare(
+            "SELECT * FROM packages
+             WHERE parent_package_id = ? AND type = 'sub' AND is_active = 1
+             ORDER BY price ASC"
+        );
+        $subStmt->execute([$main['package_id']]);
+        $subs = $subStmt->fetchAll();
+
+        foreach ($subs as &$s) {
+            $s['services_arr'] = [];
+            if (!empty($s['services'])) {
+                $decoded = json_decode($s['services'], true);
+                if (is_array($decoded)) $s['services_arr'] = $decoded;
+            }
+        }
+        unset($s);
+
+        $result[] = array_merge($main, ['sub_packages' => $subs]);
+    }
+
+    return $result;
+}
