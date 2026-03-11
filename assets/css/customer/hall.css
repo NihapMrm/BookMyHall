@@ -1,0 +1,320 @@
+/* ─── hall.css — Customer Hall View Styles ───────────────────────────────── */
+
+/* ── Hall Hero ───────────────────────────────────────────────────────────── */
+.hall-hero {
+    position: relative;
+    height: 420px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1a1f4e, #4d5dfb);
+    margin-bottom: 32px;
+}
+
+.hall-hero img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.hall-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10,10,30,.75) 0%, rgba(0,0,0,.15) 60%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 32px 36px;
+    color: #fff;
+}
+
+.hall-hero-overlay h1 {
+    font-size: 32px;
+    font-weight: 800;
+    margin: 0 0 8px;
+}
+
+.hall-hero-overlay .hall-hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 14px;
+    opacity: .85;
+    flex-wrap: wrap;
+}
+
+.hall-hero-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ── Gallery Slider ──────────────────────────────────────────────────────── */
+.gallery-section { margin-bottom: 32px; }
+
+.gallery-section h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 16px;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.gallery-thumb {
+    aspect-ratio: 4/3;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #eef1ff;
+    cursor: pointer;
+    position: relative;
+}
+
+.gallery-thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform .25s;
+}
+
+.gallery-thumb:hover img { transform: scale(1.06); }
+
+/* ── Hall Info Grid ──────────────────────────────────────────────────────── */
+.hall-info-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.hall-description-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 28px 28px;
+    box-shadow: 0 4px 20px rgba(112,144,176,.12);
+}
+
+.hall-description-card h2 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eaedf7;
+}
+
+.hall-description-card p {
+    font-size: 15px;
+    color: #6c6f83;
+    line-height: 1.75;
+    margin: 0;
+}
+
+/* ── Key Stats Card ──────────────────────────────────────────────────────── */
+.hall-stats-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 28px 24px;
+    box-shadow: 0 4px 20px rgba(112,144,176,.12);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.hall-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.hall-stat-item .hsi-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: #eef1ff;
+    color: #4d5dfb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.hall-stat-item .hsi-text .hsi-val {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.hall-stat-item .hsi-text .hsi-lbl {
+    font-size: 12px;
+    color: #6c6f83;
+    margin-top: 2px;
+}
+
+/* ── Amenities Section ───────────────────────────────────────────────────── */
+.amenities-section {
+    background: #fff;
+    border-radius: 20px;
+    padding: 28px 28px;
+    box-shadow: 0 4px 20px rgba(112,144,176,.12);
+    margin-bottom: 40px;
+}
+
+.amenities-section h2 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 18px;
+}
+
+.amenities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.amenity-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: #eef1ff;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4d5dfb;
+}
+
+.amenity-card i { font-size: 18px; }
+
+.amenity-card.unavailable {
+    background: #f5f7fd;
+    color: #bbb;
+}
+
+/* ── Package Cards ───────────────────────────────────────────────────────── */
+.packages-section { margin-bottom: 48px; }
+
+.packages-section > h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 24px;
+}
+
+.main-pkg-panel {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(112,144,176,.12);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.main-pkg-panel-header {
+    padding: 20px 24px;
+    background: linear-gradient(90deg, #eef1ff, #f5f7fd);
+    border-bottom: 1px solid #eaedf7;
+}
+
+.main-pkg-panel-header h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.main-pkg-panel-header p {
+    font-size: 13px;
+    color: #6c6f83;
+    margin: 0;
+}
+
+.sub-pkg-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    padding: 20px 24px;
+}
+
+.sub-pkg-card {
+    background: #f8f9fe;
+    border-radius: 14px;
+    padding: 20px 18px;
+    border: 2px solid transparent;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sub-pkg-card:hover {
+    border-color: #4d5dfb;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(77,93,251,.15);
+}
+
+.sub-pkg-card .spkg-name {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.sub-pkg-card .spkg-desc {
+    font-size: 13px;
+    color: #6c6f83;
+    line-height: 1.6;
+    flex: 1;
+}
+
+.sub-pkg-card .spkg-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 12px;
+    color: #6c6f83;
+    flex-wrap: wrap;
+}
+
+.spkg-meta span { display: flex; align-items: center; gap: 5px; }
+
+.sub-pkg-card .spkg-services {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.spkg-services .svc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #eef1ff;
+    color: #4d5dfb;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 999px;
+}
+
+.sub-pkg-card .spkg-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid #eaedf7;
+}
+
+.spkg-footer .spkg-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #4d5dfb;
+}
+
+.spkg-footer .spkg-price small {
+    font-size: 11px;
+    font-weight: 400;
+    color: #6c6f83;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .hall-hero { height: 260px; }
+    .hall-hero-overlay { padding: 20px; }
+    .hall-info-grid { grid-template-columns: 1fr; }
+    .sub-pkg-cards { grid-template-columns: 1fr; padding: 16px; }
+}
