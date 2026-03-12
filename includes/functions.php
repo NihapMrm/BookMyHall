@@ -92,18 +92,20 @@ function redirect(string $url): void
  * Check whether a sub-package is available for a given date/time range.
  * Returns true if the slot is free, false if a conflict exists.
  */
-function checkAvailability(PDO $pdo, string $date, string $start, string $end, int $packageId): bool
+function checkAvailability(PDO $pdo, string $startDate, string $startTime, string $endTime, int $packageId, string $endDate = ''): bool
 {
+    if ($endDate === '') $endDate = $startDate;
     try {
+        // Conflict if any existing booking's date range overlaps the requested range
         $stmt = $pdo->prepare(
             "SELECT COUNT(*) FROM bookings
              WHERE sub_package_id = ?
-               AND event_date = ?
+               AND event_date <= ?
+               AND COALESCE(end_date, event_date) >= ?
                AND status NOT IN ('rejected','cancelled')
-               AND is_deleted = 0
-               AND NOT (end_time <= ? OR start_time >= ?)"
+               AND is_deleted = 0"
         );
-        $stmt->execute([$packageId, $date, $start, $end]);
+        $stmt->execute([$packageId, $endDate, $startDate]);
         return (int) $stmt->fetchColumn() === 0;
     } catch (PDOException $e) {
         error_log("checkAvailability error: " . $e->getMessage());

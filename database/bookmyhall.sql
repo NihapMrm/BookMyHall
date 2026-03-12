@@ -84,6 +84,7 @@ CREATE TABLE IF NOT EXISTS `bookings` (
     `hall_id`          INT UNSIGNED    NOT NULL,
     `sub_package_id`   INT UNSIGNED    NOT NULL,
     `event_date`       DATE            NOT NULL,
+    `end_date`         DATE            NULL,
     `start_time`       TIME            NOT NULL,
     `end_time`         TIME            NOT NULL,
     `event_type`       VARCHAR(100)    DEFAULT NULL,
