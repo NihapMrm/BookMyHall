@@ -49,11 +49,6 @@ $_showSearch = !in_array(basename($_SERVER['PHP_SELF']), $_hideSearchPages, true
     </div>
 
     <div class="topbar__right">
-        <!-- Notifications (badge wired in Phase 4) -->
-        <button class="topbar__icon-button" aria-label="Notifications">
-            <i class="fa-solid fa-bell"></i>
-        </button>
-
         <!-- Profile dropdown -->
         <div class="topbar__profile" role="button" aria-haspopup="true" aria-expanded="false" tabindex="0">
             <div class="topbar__avatar-placeholder" aria-hidden="true"><?= htmlspecialchars($initials) ?></div>
