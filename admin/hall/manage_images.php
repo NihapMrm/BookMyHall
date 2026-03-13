@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
     }
     redirect(BASE_URL . '/admin/hall/manage_images.php');
-}
+} 
 
 // ── UPLOAD Images ─────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['hallImages'])) {
