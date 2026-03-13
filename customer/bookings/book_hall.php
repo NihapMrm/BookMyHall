@@ -184,7 +184,7 @@ $pageSubtitle = 'Submit your reservation request';
             <i class="fa-solid fa-box-open"></i> &nbsp;1. Select Package
         </div>
 
-        <div style="margin-bottom:4px;">
+        <div style="margin-bottom:4px;display: flex;flex-direction: column;gap: 20px;">
             <?php foreach ($packages as $pkg): ?>
             <?php $isPreselected = $preselectedPkg === (int)$pkg['package_id']; ?>
             <label class="package-option <?= $isPreselected ? 'selected' : '' ?>" for="pkg_<?= $pkg['package_id'] ?>">
