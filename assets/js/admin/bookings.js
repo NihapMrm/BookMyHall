@@ -11,12 +11,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnCal    = document.getElementById('btn-view-cal');
     const btnTable  = document.getElementById('btn-view-table');
 
+    const calFilterWrap = document.getElementById('cal-filter-wrap');
+
     if (btnCal && btnTable) {
         btnCal.addEventListener('click', function () {
             calView.style.display   = 'block';
             tableView.style.display = 'none';
             btnCal.classList.add('active');
             btnTable.classList.remove('active');
+            if (calFilterWrap) calFilterWrap.style.display = 'block';
             localStorage.setItem('bk_view', 'calendar');
         });
 
@@ -25,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tableView.style.display = 'block';
             btnTable.classList.add('active');
             btnCal.classList.remove('active');
+            if (calFilterWrap) calFilterWrap.style.display = 'none';
             localStorage.setItem('bk_view', 'table');
         });
 
@@ -37,6 +41,24 @@ document.addEventListener('DOMContentLoaded', function () {
     /* ─── Calendar ──────────────────────────────────────────────────────────── */
     if (typeof BOOKING_DATA !== 'undefined') {
         initAdminCalendar(BOOKING_DATA);
+    }
+
+    /* ─── Auto-submit table filters ───────────────────────────────────────── */
+    const filterForm = document.getElementById('filter-form');
+    if (filterForm) {
+        // Debounced submit for text search
+        const searchInput = filterForm.querySelector('input[name="q"]');
+        if (searchInput) {
+            let debounceTimer;
+            searchInput.addEventListener('input', function () {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(function () { filterForm.submit(); }, 500);
+            });
+        }
+        // Immediate submit for selects and date inputs
+        filterForm.querySelectorAll('select, input[type="date"]').forEach(function (el) {
+            el.addEventListener('change', function () { filterForm.submit(); });
+        });
     }
 
     /* ─── Confirm dialogs for approve/reject/complete actions ───────────────── */
