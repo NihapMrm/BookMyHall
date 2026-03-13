@@ -49,7 +49,7 @@ try {
         "SELECT b.booking_id, b.status, b.event_date, b.end_date,
                 p.name AS package_name
          FROM bookings b
-         JOIN packages p ON p.package_id = b.sub_package_id
+         JOIN packages p ON p.package_id = b.package_id
          WHERE b.booking_id = ? AND b.customer_id = ? AND b.is_deleted = 0
          LIMIT 1"
     );

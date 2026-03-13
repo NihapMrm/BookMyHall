@@ -92,7 +92,7 @@ try {
             FROM feedback f
             JOIN users u    ON u.user_id    = f.customer_id
             JOIN bookings b ON b.booking_id = f.booking_id
-            JOIN packages p ON p.package_id = b.sub_package_id
+            JOIN packages p ON p.package_id = b.package_id
             $where
             ORDER BY f.created_at DESC
             LIMIT $perPage OFFSET $offset";

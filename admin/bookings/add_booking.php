@@ -24,15 +24,15 @@ try {
     $hall = $pdo->query("SELECT * FROM hall LIMIT 1")->fetch();
 } catch (PDOException $e) { error_log('add_booking hall: ' . $e->getMessage()); }
 
-$packageGroups = [];
+$packages = [];
 if ($hall) {
-    $packageGroups = getPackagesByHall($pdo, (int)$hall['hall_id']);
+    $packages = getPackagesByHall($pdo, (int)$hall['hall_id']);
 }
 
 // ─── Handle POST ───────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $customerId     = (int)($_POST['customer_id']    ?? 0);
-    $subPackageId   = (int)($_POST['sub_package_id'] ?? 0);
+    $packageId      = (int)($_POST['package_id']      ?? 0);
     $eventDate      = sanitizeInput($_POST['event_date']      ?? '');
     $startTime      = sanitizeInput($_POST['start_time']      ?? '');
     $endTime        = sanitizeInput($_POST['end_time']        ?? '');
@@ -41,8 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $specialReqs    = sanitizeInput($_POST['special_requests'] ?? '');
 
     // Validate
-    if ($customerId <= 0)    $errors[] = 'Please select a customer.';
-    if ($subPackageId <= 0) $errors[] = 'Please select a package.';
+    if ($customerId <= 0)   $errors[] = 'Please select a customer.';
+    if ($packageId <= 0)   $errors[] = 'Please select a package.';
     if ($eventDate === '')  $errors[] = 'Event date is required.';
     if ($startTime === '' || $endTime === '') $errors[] = 'Start and end times are required.';
     if ($startTime >= $endTime) $errors[] = 'End time must be after start time.';
@@ -55,17 +55,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         // Check availability
-        $available = checkAvailability($pdo, $eventDate, $startTime, $endTime, $subPackageId);
+        $available = checkAvailability($pdo, $eventDate, $startTime, $endTime, $packageId);
         if (!$available) {
             $errors[] = 'This time slot is already booked for the selected package. Please choose a different time.';
         }
     }
 
     if (empty($errors)) {
-        // Fetch sub-package price
+        // Fetch package price
         try {
-            $pkgStmt = $pdo->prepare("SELECT price FROM packages WHERE package_id = ? AND type = 'sub' AND is_active = 1");
-            $pkgStmt->execute([$subPackageId]);
+            $pkgStmt = $pdo->prepare("SELECT price FROM packages WHERE package_id = ? AND is_active = 1");
+            $pkgStmt->execute([$packageId]);
             $pkgRow = $pkgStmt->fetch();
         } catch (PDOException $e) {
             error_log('add_booking pkg price: ' . $e->getMessage());
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $ins = $pdo->prepare(
                     "INSERT INTO bookings
-                     (customer_id, hall_id, sub_package_id, event_date, start_time, end_time,
+                     (customer_id, hall_id, package_id, event_date, start_time, end_time,
                       event_type, guest_count, special_requests,
                       total_amount, advance_amount, balance_amount, status, created_at)
                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())"
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $ins->execute([
                     $customerId,
                     $hall['hall_id'],
-                    $subPackageId,
+                    $packageId,
                     $eventDate,
                     $startTime,
                     $endTime,
@@ -179,23 +179,19 @@ $pageSubtitle = 'Create a booking on behalf of a customer';
                 <!-- Package selection -->
                 <div class="form-group full-width">
                     <label class="form-label">Package <span class="text-danger">*</span></label>
-                    <?php if (empty($packageGroups)): ?>
+                    <?php if (empty($packages)): ?>
                         <p style="color:var(--danger);font-size:.85rem;">No active packages available.</p>
                     <?php else: ?>
-                    <select class="form-control" name="sub_package_id" id="sub_package_id" required>
+                    <select class="form-control" name="package_id" id="package_id" required>
                         <option value="">— Select a package —</option>
-                        <?php foreach ($packageGroups as $main): ?>
-                            <optgroup label="<?= htmlspecialchars($main['name']) ?>">
-                            <?php foreach ($main['sub_packages'] as $sub): ?>
-                                <option value="<?= $sub['package_id'] ?>"
-                                        data-price="<?= (float)$sub['price'] ?>"
-                                    <?= (int)($_POST['sub_package_id'] ?? 0) === (int)$sub['package_id'] ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($sub['name']) ?> —
-                                    <?= htmlspecialchars(formatCurrency((float)$sub['price'])) ?>
-                                    (<?= (int)$sub['seat_capacity'] ?> seats)
-                                </option>
-                            <?php endforeach; ?>
-                            </optgroup>
+                        <?php foreach ($packages as $pkg): ?>
+                            <option value="<?= $pkg['package_id'] ?>"
+                                    data-price="<?= (float)$pkg['price'] ?>"
+                                <?= (int)($_POST['package_id'] ?? 0) === (int)$pkg['package_id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($pkg['name']) ?> —
+                                <?= htmlspecialchars(formatCurrency((float)$pkg['price'])) ?>
+                                (<?= (int)$pkg['seat_capacity'] ?> seats)
+                            </option>
                         <?php endforeach; ?>
                     </select>
                     <?php endif; ?>
@@ -282,7 +278,7 @@ $pageSubtitle = 'Create a booking on behalf of a customer';
 <script>
     const BASE_URL = '<?= BASE_URL ?>';
     // Admin package selector — price preview
-    document.getElementById('sub_package_id')?.addEventListener('change', function () {
+    document.getElementById('package_id')?.addEventListener('change', function () {
         const opt  = this.options[this.selectedIndex];
         const price = parseFloat(opt.dataset.price) || 0;
         const ADVANCE_PCT = 0.30;

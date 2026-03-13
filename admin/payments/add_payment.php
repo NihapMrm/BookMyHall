@@ -21,7 +21,7 @@ try {
                 COALESCE(SUM(CASE WHEN py.status = 'paid' THEN py.amount ELSE 0 END), 0) AS paid_total
          FROM bookings b
          JOIN users u    ON u.user_id    = b.customer_id
-         JOIN packages p ON p.package_id = b.sub_package_id
+         JOIN packages p ON p.package_id = b.package_id
          LEFT JOIN payments py ON py.booking_id = b.booking_id
          WHERE b.is_deleted = 0
            AND b.status IN ('approved','completed')

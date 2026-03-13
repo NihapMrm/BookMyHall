@@ -46,7 +46,7 @@ try {
                 p.name AS package_name
          FROM feedback f
          JOIN bookings b ON b.booking_id = f.booking_id
-         JOIN packages p ON p.package_id = b.sub_package_id
+         JOIN packages p ON p.package_id = b.package_id
          WHERE f.customer_id = ?
          ORDER BY f.created_at DESC"
     );
@@ -63,7 +63,7 @@ try {
         "SELECT b.booking_id, b.event_date, b.event_type,
                 p.name AS package_name, h.name AS hall_name
          FROM bookings b
-         JOIN packages p ON p.package_id = b.sub_package_id
+         JOIN packages p ON p.package_id = b.package_id
          JOIN hall h ON h.hall_id = b.hall_id
          LEFT JOIN feedback f ON f.booking_id = b.booking_id
          WHERE b.customer_id = ?

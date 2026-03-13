@@ -8,10 +8,8 @@ require_once __DIR__ . '/../../includes/db_connection.php';
 require_once __DIR__ . '/../../includes/functions.php';
 require_once __DIR__ . '/../../includes/session_guard.php';
 
-$errors = [];
-$package = null;
-$mainPackages = [];
-
+$errors    = [];
+$package   = null;
 $packageId = (int) ($_GET['id'] ?? 0);
 
 if ($packageId <= 0) {
@@ -25,13 +23,6 @@ try {
         $stmt = $pdo->prepare("SELECT * FROM packages WHERE package_id = ? AND hall_id = ?");
         $stmt->execute([$packageId, $hall['hall_id']]);
         $package = $stmt->fetch();
-
-        // All main packages (for parent selector if this is a sub)
-        $stmt2 = $pdo->prepare(
-            "SELECT package_id, name FROM packages WHERE hall_id = ? AND type = 'main' AND package_id != ? ORDER BY name"
-        );
-        $stmt2->execute([$hall['hall_id'], $packageId]);
-        $mainPackages = $stmt2->fetchAll();
     }
 } catch (PDOException $e) {
     error_log("edit_package load: " . $e->getMessage());
@@ -59,15 +50,13 @@ $serviceLabels = [
 
 // ── POST Handler ─────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name              = sanitizeInput($_POST['name'] ?? '');
-    $type              = in_array($_POST['type'] ?? '', ['main','sub']) ? $_POST['type'] : $package['type'];
-    $parent_package_id = (int) ($_POST['parent_package_id'] ?? 0);
-    $price             = (float) ($_POST['price'] ?? 0);
-    $seat_capacity     = !empty($_POST['seat_capacity']) ? (int)$_POST['seat_capacity'] : null;
-    $parking_capacity  = !empty($_POST['parking_capacity']) ? (int)$_POST['parking_capacity'] : null;
-    $description       = sanitizeInput($_POST['description'] ?? '');
-    $inclusions        = sanitizeInput($_POST['inclusions'] ?? '');
-    $is_active         = isset($_POST['is_active']) ? 1 : 0;
+    $name             = sanitizeInput($_POST['name'] ?? '');
+    $price            = (float) ($_POST['price'] ?? 0);
+    $seat_capacity    = !empty($_POST['seat_capacity']) ? (int)$_POST['seat_capacity'] : null;
+    $parking_capacity = !empty($_POST['parking_capacity']) ? (int)$_POST['parking_capacity'] : null;
+    $description      = sanitizeInput($_POST['description'] ?? '');
+    $inclusions       = sanitizeInput($_POST['inclusions'] ?? '');
+    $is_active        = isset($_POST['is_active']) ? 1 : 0;
 
     $selectedServices = [];
     foreach ($serviceKeys as $key) {
@@ -75,37 +64,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $selectedServices[] = $key;
         }
     }
-    $servicesJson = json_encode($selectedServices);
+    $servicesJson    = json_encode($selectedServices);
     $currentServices = $selectedServices;
 
     // Update package object for re-render on error
     $package = array_merge($package, [
-        'name'             => $name, 'type' => $type,
-        'parent_package_id' => $parent_package_id,
-        'price'            => $price, 'seat_capacity' => $seat_capacity,
-        'parking_capacity' => $parking_capacity, 'description' => $description,
-        'inclusions'       => $inclusions, 'is_active' => $is_active,
+        'name'             => $name,
+        'price'            => $price,
+        'seat_capacity'    => $seat_capacity,
+        'parking_capacity' => $parking_capacity,
+        'description'      => $description,
+        'inclusions'       => $inclusions,
+        'is_active'        => $is_active,
     ]);
 
-    // Validation
-    if (empty($name))    $errors[] = 'Package name is required.';
-    if ($price < 0)      $errors[] = 'Price cannot be negative.';
-    if ($type === 'sub' && $parent_package_id <= 0) {
-        $errors[] = 'Please select a parent package for a sub-package.';
-    }
+    if (empty($name)) $errors[] = 'Package name is required.';
+    if ($price < 0)   $errors[] = 'Price cannot be negative.';
 
     if (empty($errors)) {
         try {
             $stmt = $pdo->prepare(
                 "UPDATE packages
-                 SET name=?, type=?, parent_package_id=?, price=?, seat_capacity=?,
+                 SET name=?, price=?, seat_capacity=?,
                      parking_capacity=?, description=?, inclusions=?, services=?, is_active=?
                  WHERE package_id=?"
             );
             $stmt->execute([
-                $name, $type,
-                $type === 'sub' ? $parent_package_id : null,
-                $price, $seat_capacity, $parking_capacity,
+                $name, $price, $seat_capacity, $parking_capacity,
                 $description, $inclusions, $servicesJson, $is_active,
                 $packageId,
             ]);
@@ -158,34 +143,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form method="POST" action="">
             <div class="pkg-form-card">
-
-                <!-- Type Toggle -->
-                <div class="form-group">
-                    <label class="form-label">Package Type</label>
-                    <div class="pkg-type-toggle">
-                        <input type="radio" id="type_main" name="type" value="main"
-                               <?= $package['type'] === 'main' ? 'checked' : '' ?>>
-                        <label for="type_main">Main Package</label>
-
-                        <input type="radio" id="type_sub" name="type" value="sub"
-                               <?= $package['type'] === 'sub' ? 'checked' : '' ?>>
-                        <label for="type_sub">Sub-Package</label>
-                    </div>
-                </div>
-
-                <!-- Parent Package -->
-                <div class="form-group pkg-parent-field <?= $package['type'] === 'main' ? 'hidden' : '' ?>">
-                    <label class="form-label">Parent Package <span class="required">*</span></label>
-                    <select name="parent_package_id" class="form-control">
-                        <option value="">— Select Main Package —</option>
-                        <?php foreach ($mainPackages as $mp): ?>
-                            <option value="<?= $mp['package_id'] ?>"
-                                <?= $package['parent_package_id'] == $mp['package_id'] ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($mp['name']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
 
                 <!-- Name & Price -->
                 <div class="form-row">

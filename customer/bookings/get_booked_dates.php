@@ -27,7 +27,7 @@ try {
     $stmt = $pdo->prepare(
         "SELECT event_date AS `start`, COALESCE(end_date, event_date) AS `end`
          FROM bookings
-         WHERE sub_package_id = ?
+         WHERE package_id = ?
            AND status NOT IN ('rejected','cancelled')
            AND is_deleted = 0
            AND COALESCE(end_date, event_date) >= CURDATE()

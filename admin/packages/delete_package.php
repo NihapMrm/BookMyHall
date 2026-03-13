@@ -16,8 +16,7 @@ if ($packageId <= 0) {
     redirect(BASE_URL . '/admin/packages/manage_packages.php');
 }
 
-$package    = null;
-$subCount   = 0;
+$package        = null;
 $activeBookings = 0;
 
 try {
@@ -28,32 +27,13 @@ try {
         $package = $stmt->fetch();
 
         if ($package) {
-            // Count sub-packages (only relevant for main)
-            if ($package['type'] === 'main') {
-                $s = $pdo->prepare("SELECT COUNT(*) FROM packages WHERE parent_package_id = ?");
-                $s->execute([$packageId]);
-                $subCount = (int) $s->fetchColumn();
-            }
-
-            // Count active (non-cancelled/rejected) bookings using this package or any of its subs
-            if ($package['type'] === 'main') {
-                $b = $pdo->prepare(
-                    "SELECT COUNT(*) FROM bookings b
-                     JOIN packages p ON b.sub_package_id = p.package_id
-                     WHERE p.parent_package_id = ?
-                       AND b.status IN ('pending','approved')
-                       AND b.is_deleted = 0"
-                );
-                $b->execute([$packageId]);
-            } else {
-                $b = $pdo->prepare(
-                    "SELECT COUNT(*) FROM bookings
-                     WHERE sub_package_id = ?
-                       AND status IN ('pending','approved')
-                       AND is_deleted = 0"
-                );
-                $b->execute([$packageId]);
-            }
+            $b = $pdo->prepare(
+                "SELECT COUNT(*) FROM bookings
+                 WHERE package_id = ?
+                   AND status IN ('pending','approved')
+                   AND is_deleted = 0"
+            );
+            $b->execute([$packageId]);
             $activeBookings = (int) $b->fetchColumn();
         }
     }
@@ -73,7 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
         redirect(BASE_URL . '/admin/packages/manage_packages.php');
     }
     try {
-        // Sub-packages are deleted by CASCADE (FK: parent_package_id ON DELETE SET NULL / CASCADE)
         $pdo->prepare("DELETE FROM packages WHERE package_id = ?")->execute([$packageId]);
         setFlash('success', 'Package "' . $package['name'] . '" deleted successfully.');
         redirect(BASE_URL . '/admin/packages/manage_packages.php');
@@ -123,7 +102,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
                 </p>
                 <div class="pkg-summary">
                     <div class="ps-row"><span>Package</span><span><?= htmlspecialchars($package['name']) ?></span></div>
-                    <div class="ps-row"><span>Type</span><span><?= ucfirst($package['type']) ?></span></div>
                     <div class="ps-row"><span>Active Bookings</span><span style="color:var(--danger);"><?= $activeBookings ?></span></div>
                 </div>
                 <div class="dc-actions">
@@ -146,16 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
 
                 <div class="pkg-summary">
                     <div class="ps-row"><span>Package Name</span><span><?= htmlspecialchars($package['name']) ?></span></div>
-                    <div class="ps-row"><span>Type</span><span><?= ucfirst($package['type']) ?></span></div>
                     <div class="ps-row"><span>Price</span><span><?= formatCurrency($package['price']) ?></span></div>
-                    <?php if ($package['type'] === 'main' && $subCount > 0): ?>
-                    <div class="ps-row">
-                        <span>Sub-Packages</span>
-                        <span style="color:var(--warning);">
-                            <?= $subCount ?> sub-package<?= $subCount !== 1 ? 's' : '' ?> will also be deleted
-                        </span>
-                    </div>
-                    <?php endif; ?>
                     <div class="ps-row"><span>Active Bookings</span><span style="color:var(--success);">None</span></div>
                 </div>
 

@@ -73,7 +73,7 @@ try {
                 p.name       AS package_name
          FROM bookings b
          JOIN users u    ON u.user_id    = b.customer_id
-         JOIN packages p ON p.package_id = b.sub_package_id
+         JOIN packages p ON p.package_id = b.package_id
          WHERE b.is_deleted = 0 AND b.event_date BETWEEN ? AND ?
          ORDER BY b.event_date ASC"
     );

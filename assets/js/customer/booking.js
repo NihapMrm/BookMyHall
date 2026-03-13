@@ -6,7 +6,7 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     // ─── Elements ─────────────────────────────────────────────────────────────
-    const pkgRadios       = document.querySelectorAll('input[name="sub_package_id"]');
+    const pkgRadios       = document.querySelectorAll('input[name="package_id"]');
     const totalEl         = document.getElementById('price-total');
     const advanceEl       = document.getElementById('price-advance');
     const balanceEl       = document.getElementById('price-balance');
@@ -109,12 +109,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ─── Package Helpers ──────────────────────────────────────────────────────
     function getSelectedPkgId() {
-        const el = document.querySelector('input[name="sub_package_id"]:checked');
+        const el = document.querySelector('input[name="package_id"]:checked');
         return el ? el.value : null;
     }
 
     function getSelectedPkgPrice() {
-        const el = document.querySelector('input[name="sub_package_id"]:checked');
+        const el = document.querySelector('input[name="package_id"]:checked');
         return el ? (parseFloat(el.dataset.price) || 0) : 0;
     }
 
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ─── Init ─────────────────────────────────────────────────────────────────
-    const preSelected = document.querySelector('input[name="sub_package_id"]:checked');
+    const preSelected = document.querySelector('input[name="package_id"]:checked');
     if (preSelected) {
         fetchBookedDates(preSelected.value); // also calls renderCalendar() + updatePriceSummary inside
     } else {

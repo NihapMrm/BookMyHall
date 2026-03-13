@@ -29,17 +29,18 @@ try {
     $hall = $pdo->query("SELECT * FROM hall LIMIT 1")->fetch();
 } catch (PDOException $e) { error_log('book_hall hall: ' . $e->getMessage()); }
 
-$packageGroups = [];
+// Fetch packages flat list
+$packages = [];
 if ($hall) {
-    $packageGroups = getPackagesByHall($pdo, (int)$hall['hall_id']);
+    $packages = getPackagesByHall($pdo, (int)$hall['hall_id']);
 }
 
 // Pre-select package if passed via URL
-$preselectedPkg = (int)($_GET['pkg'] ?? 0);
+$preselectedPkg = (int)($_GET['package'] ?? 0);
 
 // ─── Handle POST ───────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $subPackageId = (int)($_POST['sub_package_id'] ?? 0);
+    $packageId  = (int)($_POST['package_id'] ?? 0);
     $startDate    = sanitizeInput($_POST['start_date']       ?? '');
     $endDate      = sanitizeInput($_POST['end_date']         ?? '');
     $startTime    = sanitizeInput($_POST['start_time']       ?? '');
@@ -52,8 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($endDate === '') $endDate = $startDate;
 
     // Validations
-    if ($subPackageId <= 0) $errors[] = 'Please select a package.';
-    if ($startDate === '')  $errors[] = 'Please select an event date on the calendar.';
+    if ($packageId <= 0)    $errors[] = 'Please select a package.';
+    if ($startDate === '')    $errors[] = 'Please select an event date on the calendar.';
     if ($startTime === '' || $endTime === '') $errors[] = 'Daily start and end times are required.';
     if ($startTime !== '' && $endTime !== '' && $startTime >= $endTime) {
         $errors[] = 'End time must be after start time.';
@@ -67,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $available = checkAvailability($pdo, $startDate, $startTime, $endTime, $subPackageId, $endDate);
+        $available = checkAvailability($pdo, $startDate, $startTime, $endTime, $packageId, $endDate);
         if (!$available) {
             $errors[] = 'Sorry, the selected dates are already booked for this package. Please choose different dates.';
         }
@@ -79,9 +80,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 "SELECT p.package_id, p.price, p.seat_capacity, h.hall_id
                  FROM packages p
                  JOIN hall h ON h.hall_id = p.hall_id
-                 WHERE p.package_id = ? AND p.type = 'sub' AND p.is_active = 1"
+                 WHERE p.package_id = ? AND p.is_active = 1"
             );
-            $pkgStmt->execute([$subPackageId]);
+            $pkgStmt->execute([$packageId]);
             $pkgRow = $pkgStmt->fetch();
         } catch (PDOException $e) {
             error_log('book_hall pkg: ' . $e->getMessage());
@@ -101,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $ins = $pdo->prepare(
                     "INSERT INTO bookings
-                     (customer_id, hall_id, sub_package_id, event_date, end_date, start_time, end_time,
+                     (customer_id, hall_id, package_id, event_date, end_date, start_time, end_time,
                       event_type, guest_count, special_requests,
                       total_amount, advance_amount, balance_amount, status, created_at)
                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())"
@@ -109,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $ins->execute([
                     $_SESSION['customer_id'],
                     $pkgRow['hall_id'],
-                    $subPackageId,
+                    $packageId,
                     $startDate,
                     $endDate,
                     $startTime,
@@ -168,7 +169,7 @@ $pageSubtitle = 'Submit your reservation request';
 
     <?php if (!$hall): ?>
     <div class="alert alert-info">The hall information is not available at this time. Please contact us directly.</div>
-    <?php elseif (empty($packageGroups)): ?>
+    <?php elseif (empty($packages)): ?>
     <div class="alert alert-info">No packages are currently available for booking. Please check back later.</div>
     <?php else: ?>
 
@@ -184,41 +185,32 @@ $pageSubtitle = 'Submit your reservation request';
         </div>
 
         <div style="margin-bottom:4px;">
-            <?php foreach ($packageGroups as $main): ?>
-            <?php if (!empty($main['sub_packages'])): ?>
-            <div class="pkg-group-title">
-                <i class="fa-solid fa-layer-group"></i> <?= htmlspecialchars($main['name']) ?>
-            </div>
-            <div class="package-selector" style="margin-bottom:14px;">
-                <?php foreach ($main['sub_packages'] as $sub): ?>
-                <?php $isPreselected = $preselectedPkg === (int)$sub['package_id']; ?>
-                <label class="package-option <?= $isPreselected ? 'selected' : '' ?>" for="pkg_<?= $sub['package_id'] ?>">
-                    <input type="radio"
-                           id="pkg_<?= $sub['package_id'] ?>"
-                           name="sub_package_id"
-                           value="<?= $sub['package_id'] ?>"
-                           data-price="<?= (float)$sub['price'] ?>"
-                           <?= $isPreselected ? 'checked' : '' ?>/>
-                    <div class="package-option-info">
-                        <div class="package-option-name"><?= htmlspecialchars($sub['name']) ?></div>
-                        <div class="package-option-meta">
-                            <i class="fa-solid fa-users"></i> Up to <?= (int)$sub['seat_capacity'] ?> guests
-                            <?php if ($sub['parking_capacity']): ?>
-                            &nbsp;·&nbsp; <i class="fa-solid fa-car"></i> <?= (int)$sub['parking_capacity'] ?> parking
-                            <?php endif; ?>
-                            <?php if (!empty($sub['services_arr'])): ?>
-                            &nbsp;·&nbsp; <?= htmlspecialchars(implode(', ', array_map('ucfirst', $sub['services_arr']))) ?>
-                            <?php endif; ?>
-                        </div>
+            <?php foreach ($packages as $pkg): ?>
+            <?php $isPreselected = $preselectedPkg === (int)$pkg['package_id']; ?>
+            <label class="package-option <?= $isPreselected ? 'selected' : '' ?>" for="pkg_<?= $pkg['package_id'] ?>">
+                <input type="radio"
+                       id="pkg_<?= $pkg['package_id'] ?>"
+                       name="package_id"
+                       value="<?= $pkg['package_id'] ?>"
+                       data-price="<?= (float)$pkg['price'] ?>"
+                       <?= $isPreselected ? 'checked' : '' ?>/>
+                <div class="package-option-info">
+                    <div class="package-option-name"><?= htmlspecialchars($pkg['name']) ?></div>
+                    <div class="package-option-meta">
+                        <i class="fa-solid fa-users"></i> Up to <?= (int)$pkg['seat_capacity'] ?> guests
+                        <?php if ($pkg['parking_capacity']): ?>
+                        &nbsp;·&nbsp; <i class="fa-solid fa-car"></i> <?= (int)$pkg['parking_capacity'] ?> parking
+                        <?php endif; ?>
+                        <?php if (!empty($pkg['services_arr'])): ?>
+                        &nbsp;·&nbsp; <?= htmlspecialchars(implode(', ', array_map('ucfirst', $pkg['services_arr']))) ?>
+                        <?php endif; ?>
                     </div>
-                    <div class="package-option-price">
-                        <?= htmlspecialchars(formatCurrency((float)$sub['price'])) ?>
-                        <span style="font-size:.7rem;font-weight:500;color:var(--text-muted)">/day</span>
-                    </div>
-                </label>
-                <?php endforeach; ?>
-            </div>
-            <?php endif; ?>
+                </div>
+                <div class="package-option-price">
+                    <?= htmlspecialchars(formatCurrency((float)$pkg['price'])) ?>
+                    <span style="font-size:.7rem;font-weight:500;color:var(--text-muted)">/day</span>
+                </div>
+            </label>
             <?php endforeach; ?>
         </div>
 
