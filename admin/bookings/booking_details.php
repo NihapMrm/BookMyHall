@@ -175,7 +175,21 @@ $pageSubtitle = 'Full booking record and actions';
             </div>
             <div class="detail-row">
                 <span class="detail-label">Date</span>
-                <span class="detail-value"><?= htmlspecialchars(formatDateReadable($booking['event_date'])) ?></span>
+                <span class="detail-value">
+                    <?php
+                    $endDate = $booking['end_date'] ?: null;
+                    if ($endDate && $endDate !== $booking['event_date']):
+                    ?>
+                        <?= htmlspecialchars(formatDateReadable($booking['event_date'])) ?>
+                        &rarr; <?= htmlspecialchars(formatDateReadable($endDate)) ?>
+                        <?php
+                        $numDays = (int)round((strtotime($endDate) - strtotime($booking['event_date'])) / 86400) + 1;
+                        echo ' <span style="background:var(--primary-light);color:var(--primary);border-radius:10px;padding:2px 8px;font-size:.75rem;font-weight:700;">' . $numDays . ' days</span>';
+                        ?>
+                    <?php else: ?>
+                        <?= htmlspecialchars(formatDateReadable($booking['event_date'])) ?>
+                    <?php endif; ?>
+                </span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Time</span>

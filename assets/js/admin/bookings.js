@@ -68,10 +68,15 @@ function initAdminCalendar(bookings) {
         bks.forEach(function (b) {
             const start = b.event_date;
             const end   = b.end_date || start;
-            let cur = new Date(start + 'T00:00:00');
-            const endDt = new Date(end + 'T00:00:00');
+
+            // Parse date strings as local dates (avoid Date("YYYY-MM-DD") UTC parsing).
+            const [sy, sm, sd] = start.split('-').map(Number);
+            const [ey, em, ed] = end.split('-').map(Number);
+            const cur = new Date(sy, sm - 1, sd);
+            const endDt = new Date(ey, em - 1, ed);
+
             while (cur <= endDt) {
-                const ds = cur.toISOString().slice(0, 10);
+                const ds = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`;
                 if (!idx[ds]) idx[ds] = [];
                 idx[ds].push(b);
                 cur.setDate(cur.getDate() + 1);

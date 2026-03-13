@@ -30,8 +30,8 @@
 | 1 – Auth & Admin Dashboard | Sahani | ✅ Complete |
 | 2 – Hall & Package Management | Riffna | ✅ Complete |
 | 3 – Customer Management | Nishtha | ✅ Complete |
-| 4 – Booking & Feedback | Afrina | 🔜 Next |
-| 5 – Payment & Reports | Nihap | 🔜 Pending |
+| 4 – Booking & Feedback | Afrina | ✅ Complete |
+| 5 – Payment & Reports | Nihap | ✅ Complete |
 
 ---
 
@@ -458,4 +458,4 @@ Before writing any code for a new module:
 
 ---
 
-*Last updated: Module 3 complete. Next: Module 4 – Booking & Feedback (Afrina).*
+*Last updated: Module 5 complete. All modules done.*
