@@ -43,7 +43,7 @@ function sidebarLink(string $href, string $icon, string $label, string $currentP
         <ul class="sidebar__section">
             <li class="sidebar__title">Finance</li>
             <?= sidebarLink(BASE_URL . '/admin/payments/manage_payments.php', 'fa-solid fa-credit-card', 'Payments', $currentPage, ['manage_payments.php','payment_details.php','add_payment.php','update_payment.php']) ?>
-            <?= sidebarLink(BASE_URL . '/admin/reports/booking_report.php',   'fa-solid fa-chart-line',  'Reports',  $currentPage, ['booking_report.php','income_report.php','monthly_report.php','utilization_report.php','customer_report.php','export_report.php']) ?>
+            <?= sidebarLink(BASE_URL . '/admin/reports/booking_report.php',   'fa-solid fa-chart-line',  'Reports',  $currentPage, ['booking_report.php','income_report.php','monthly_report.php','customer_report.php','export_report.php']) ?>
         </ul>
 
         <!-- Footer -->
