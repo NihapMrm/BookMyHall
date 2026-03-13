@@ -116,7 +116,6 @@ $pageSubtitle = 'Booking summary for the selected period';
         <a href="<?= BASE_URL ?>/admin/reports/monthly_report.php"><i class="fa-solid fa-table"></i> Monthly</a>
         <a href="<?= BASE_URL ?>/admin/reports/utilization_report.php"><i class="fa-solid fa-gauge-high"></i> Utilization</a>
         <a href="<?= BASE_URL ?>/admin/reports/customer_report.php"><i class="fa-solid fa-users"></i> Customers</a>
-        <a href="<?= BASE_URL ?>/admin/reports/export_report.php" class="no-print"><i class="fa-solid fa-file-export"></i> Export</a>
     </nav>
 
     <!-- Filters -->
