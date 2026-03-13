@@ -15,17 +15,6 @@ $subtitle = $subtitle ?: "$greeting, " . htmlspecialchars($_SESSION['full_name']
 // Avatar initials fallback
 $name     = $_SESSION['full_name'] ?? 'Admin';
 $initials = strtoupper(implode('', array_map(fn($w) => $w[0], array_slice(explode(' ', $name), 0, 2))));
-
-// Pages where the search bar should be hidden
-$_hideSearchPages = [
-    'dashboard.php',
-    'manage_hall.php', 'edit_hall.php', 'manage_images.php',
-    'manage_packages.php', 'add_package.php', 'edit_package.php',
-    'booking_report.php', 'income_report.php', 'monthly_report.php',
-    'utilization_report.php', 'customer_report.php', 'export_report.php',
-    'admin_profile.php',
-];
-$_showSearch = !in_array(basename($_SERVER['PHP_SELF']), $_hideSearchPages, true);
 ?>
 
 <header class="topbar">
@@ -35,17 +24,7 @@ $_showSearch = !in_array(basename($_SERVER['PHP_SELF']), $_hideSearchPages, true
             <p class="topbar__subtitle"><?= htmlspecialchars($subtitle) ?></p>
         </div>
 
-        <?php if ($_showSearch): ?>
-        <form class="topbar__search" role="search" action="#" method="GET">
-            <label class="sr-only" for="admin-search">Search</label>
-            <input id="admin-search" type="search" name="q"
-                   placeholder="Search anything…"
-                   value="<?= htmlspecialchars($_GET['q'] ?? '') ?>" />
-            <button type="submit" aria-label="Search">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-        </form>
-        <?php endif; ?>
+        
     </div>
 
     <div class="topbar__right">
