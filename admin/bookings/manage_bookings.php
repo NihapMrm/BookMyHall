@@ -300,9 +300,13 @@ $pageSubtitle = 'Manage reservations — calendar and list view';
                             <td style="font-size:.85rem;"><?= (int)$bk['guest_count'] ?></td>
                             <td style="font-size:.85rem;font-weight:700;"><?= htmlspecialchars(formatCurrency((float)$bk['total_amount'])) ?></td>
                             <td>
-                                <span class="badge-status <?= htmlspecialchars($bk['status']) ?>">
-                                    <?= ucfirst(htmlspecialchars($bk['status'])) ?>
-                                </span>
+                                <select class="status-select <?= htmlspecialchars($bk['status']) ?>"
+                                        data-booking-id="<?= $bk['booking_id'] ?>"
+                                        data-prev-status="<?= htmlspecialchars($bk['status']) ?>">
+                                    <?php foreach (['pending','approved','rejected','cancelled','completed'] as $s): ?>
+                                    <option value="<?= $s ?>" <?= $bk['status'] === $s ? 'selected' : '' ?>><?= ucfirst($s) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </td>
                             <td>
                                 <div class="action-cell">
@@ -310,30 +314,6 @@ $pageSubtitle = 'Manage reservations — calendar and list view';
                                        class="btn btn-sm btn-outline" title="View Details">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
-                                    <?php if ($bk['status'] === 'pending'): ?>
-                                    <form method="POST" action="<?= BASE_URL ?>/admin/bookings/approve_booking.php" style="display:inline;">
-                                        <input type="hidden" name="booking_id" value="<?= $bk['booking_id'] ?>"/>
-                                        <button type="submit" class="btn btn-sm btn-success"
-                                                data-confirm="Approve booking #<?= $bk['booking_id'] ?>?"
-                                                title="Approve">
-                                            <i class="fa-solid fa-check"></i>
-                                        </button>
-                                    </form>
-                                    <a href="<?= BASE_URL ?>/admin/bookings/reject_booking.php?booking_id=<?= $bk['booking_id'] ?>"
-                                       class="btn btn-sm btn-danger" title="Reject">
-                                        <i class="fa-solid fa-ban"></i>
-                                    </a>
-                                    <?php endif; ?>
-                                    <?php if ($bk['status'] === 'approved'): ?>
-                                    <form method="POST" action="<?= BASE_URL ?>/admin/bookings/complete_booking.php" style="display:inline;">
-                                        <input type="hidden" name="booking_id" value="<?= $bk['booking_id'] ?>"/>
-                                        <button type="submit" class="btn btn-sm btn-primary"
-                                                data-confirm="Mark booking #<?= $bk['booking_id'] ?> as completed?"
-                                                title="Mark Completed">
-                                            <i class="fa-solid fa-flag-checkered"></i>
-                                        </button>
-                                    </form>
-                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>

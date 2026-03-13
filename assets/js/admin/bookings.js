@@ -61,11 +61,39 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    /* ─── Confirm dialogs for approve/reject/complete actions ───────────────── */
-    document.querySelectorAll('[data-confirm]').forEach(function (el) {
-        el.addEventListener('click', function (e) {
-            if (!confirm(el.dataset.confirm)) e.preventDefault();
-        });
+    /* ─── Inline status change via AJAX ───────────────────────────────────── */
+    document.addEventListener('change', function (e) {
+        const sel = e.target.closest('.status-select');
+        if (!sel) return;
+
+        const bookingId = sel.dataset.bookingId;
+        const newStatus = sel.value;
+        const prevStatus = sel.dataset.prevStatus;
+
+        sel.disabled = true;
+
+        fetch(BASE_URL + '/admin/bookings/update_status.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'booking_id=' + encodeURIComponent(bookingId) + '&status=' + encodeURIComponent(newStatus)
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data.success) {
+                sel.className    = 'status-select ' + newStatus;
+                sel.dataset.prevStatus = newStatus;
+            } else {
+                sel.value        = prevStatus;
+                sel.className    = 'status-select ' + prevStatus;
+                alert('Could not update status: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(function () {
+            sel.value     = prevStatus;
+            sel.className = 'status-select ' + prevStatus;
+            alert('Network error. Please try again.');
+        })
+        .finally(function () { sel.disabled = false; });
     });
 });
 
