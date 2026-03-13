@@ -20,7 +20,7 @@ try {
         "SELECT b.*, u.full_name AS customer_name, p.name AS package_name
          FROM bookings b
          JOIN users u ON u.user_id = b.customer_id
-         JOIN packages p ON p.package_id = b.sub_package_id
+         JOIN packages p ON p.package_id = b.package_id
          WHERE b.booking_id = ? AND b.is_deleted = 0"
     );
     $stmt->execute([$bookingId]);

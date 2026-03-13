@@ -8,6 +8,33 @@ require_once __DIR__ . '/../../includes/db_connection.php';
 require_once __DIR__ . '/../../includes/functions.php';
 require_once __DIR__ . '/../../includes/customer_session_guard.php';
 
+// Auto-migrate: create feedback table if missing
+try {
+    $tableCheck = $pdo->query(
+        "SELECT COUNT(*) FROM information_schema.tables
+         WHERE table_schema = DATABASE() AND table_name = 'feedback'"
+    );
+    if ((int)$tableCheck->fetchColumn() === 0) {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS `feedback` (
+                `feedback_id`  INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+                `booking_id`   INT UNSIGNED  NOT NULL,
+                `customer_id`  INT UNSIGNED  NOT NULL,
+                `rating`       TINYINT UNSIGNED NOT NULL DEFAULT 5 COMMENT '1–5 stars',
+                `comment`      TEXT          DEFAULT NULL,
+                `is_visible`   TINYINT(1)    NOT NULL DEFAULT 1,
+                `created_at`   DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (`feedback_id`),
+                UNIQUE KEY `uq_booking_feedback` (`booking_id`),
+                FOREIGN KEY (`booking_id`)  REFERENCES `bookings`(`booking_id`) ON DELETE CASCADE,
+                FOREIGN KEY (`customer_id`) REFERENCES `users`(`user_id`)       ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        ");
+    }
+} catch (PDOException $e) {
+    error_log('submit_feedback migration: ' . $e->getMessage());
+}
+
 $customerId = (int)$_SESSION['customer_id'];
 $bookingId  = (int)($_GET['booking_id'] ?? $_POST['booking_id'] ?? 0);
 
@@ -19,10 +46,10 @@ if ($bookingId <= 0) {
 // Validate: booking must be completed, belong to this customer, and have no feedback yet
 try {
     $stmt = $pdo->prepare(
-        "SELECT b.booking_id, b.status, b.event_date,
+        "SELECT b.booking_id, b.status, b.event_date, b.end_date,
                 p.name AS package_name
          FROM bookings b
-         JOIN packages p ON p.package_id = b.sub_package_id
+         JOIN packages p ON p.package_id = b.package_id
          WHERE b.booking_id = ? AND b.customer_id = ? AND b.is_deleted = 0
          LIMIT 1"
     );
@@ -38,8 +65,9 @@ if (!$booking) {
     redirect(BASE_URL . '/customer/bookings/booking_history.php');
 }
 
-if ($booking['status'] !== 'completed') {
-    setFlash('error', 'Feedback can only be submitted for completed bookings.');
+// Allow feedback for completed bookings or approved bookings (so customers can review after confirmation).
+if (!in_array($booking['status'], ['completed', 'approved'], true)) {
+    setFlash('error', 'Feedback can only be submitted after your booking is confirmed and completed.');
     redirect(BASE_URL . '/customer/bookings/booking_details.php?id=' . $bookingId);
 }
 
@@ -111,6 +139,14 @@ $pageSubtitle = 'Share your experience with us';
             <?= htmlspecialchars($error) ?>
         </div>
         <?php endif; ?>
+
+        <!-- Back button -->
+        <div style="margin-bottom:20px;">
+            <a href="<?= BASE_URL ?>/customer/bookings/booking_details.php?id=<?= $bookingId ?>"
+               class="btn btn-outline">
+                <i class="fa-solid fa-arrow-left"></i> Back to Booking Details
+            </a>
+        </div>
 
         <div class="feedback-form-card">
 

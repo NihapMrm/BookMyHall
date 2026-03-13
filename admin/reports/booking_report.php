@@ -73,7 +73,7 @@ try {
                 p.name       AS package_name
          FROM bookings b
          JOIN users u    ON u.user_id    = b.customer_id
-         JOIN packages p ON p.package_id = b.sub_package_id
+         JOIN packages p ON p.package_id = b.package_id
          WHERE b.is_deleted = 0 AND b.event_date BETWEEN ? AND ?
          ORDER BY b.event_date ASC"
     );
@@ -116,7 +116,6 @@ $pageSubtitle = 'Booking summary for the selected period';
         <a href="<?= BASE_URL ?>/admin/reports/monthly_report.php"><i class="fa-solid fa-table"></i> Monthly</a>
         <a href="<?= BASE_URL ?>/admin/reports/utilization_report.php"><i class="fa-solid fa-gauge-high"></i> Utilization</a>
         <a href="<?= BASE_URL ?>/admin/reports/customer_report.php"><i class="fa-solid fa-users"></i> Customers</a>
-        <a href="<?= BASE_URL ?>/admin/reports/export_report.php" class="no-print"><i class="fa-solid fa-file-export"></i> Export</a>
     </nav>
 
     <!-- Filters -->

@@ -58,23 +58,20 @@ CREATE TABLE IF NOT EXISTS `hall_images` (
 
 -- ─── 4. packages ────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `packages` (
-    `package_id`          INT UNSIGNED    NOT NULL AUTO_INCREMENT,
-    `hall_id`             INT UNSIGNED    NOT NULL,
-    `parent_package_id`   INT UNSIGNED    DEFAULT NULL   COMMENT 'NULL = main package',
-    `name`                VARCHAR(150)    NOT NULL,
-    `type`                ENUM('main','sub') NOT NULL DEFAULT 'main',
-    `price`               DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
-    `seat_capacity`       INT UNSIGNED    DEFAULT NULL,
-    `parking_capacity`    INT UNSIGNED    DEFAULT NULL,
-    `description`         TEXT            DEFAULT NULL,
-    `inclusions`          TEXT            DEFAULT NULL,
-    `services`            TEXT            DEFAULT NULL   COMMENT 'JSON array: catering, ac, decoration, wifi, parking',
-    `is_active`           TINYINT(1)      NOT NULL DEFAULT 1,
-    `created_at`          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updated_at`          DATETIME        DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    `package_id`       INT UNSIGNED    NOT NULL AUTO_INCREMENT,
+    `hall_id`          INT UNSIGNED    NOT NULL,
+    `name`             VARCHAR(150)    NOT NULL,
+    `price`            DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
+    `seat_capacity`    INT UNSIGNED    DEFAULT NULL,
+    `parking_capacity` INT UNSIGNED    DEFAULT NULL,
+    `description`      TEXT            DEFAULT NULL,
+    `inclusions`       TEXT            DEFAULT NULL,
+    `services`         TEXT            DEFAULT NULL   COMMENT 'JSON array: catering, ac, decoration, wifi, parking',
+    `is_active`        TINYINT(1)      NOT NULL DEFAULT 1,
+    `created_at`       DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`       DATETIME        DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`package_id`),
-    FOREIGN KEY (`hall_id`)           REFERENCES `hall`(`hall_id`)         ON DELETE CASCADE,
-    FOREIGN KEY (`parent_package_id`) REFERENCES `packages`(`package_id`)  ON DELETE SET NULL
+    FOREIGN KEY (`hall_id`) REFERENCES `hall`(`hall_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ─── 5. bookings ────────────────────────────────────────────
@@ -82,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `bookings` (
     `booking_id`       INT UNSIGNED    NOT NULL AUTO_INCREMENT,
     `customer_id`      INT UNSIGNED    NOT NULL,
     `hall_id`          INT UNSIGNED    NOT NULL,
-    `sub_package_id`   INT UNSIGNED    NOT NULL,
+    `package_id`       INT UNSIGNED    NOT NULL,
     `event_date`       DATE            NOT NULL,
     `end_date`         DATE            NULL,
     `start_time`       TIME            NOT NULL,
@@ -101,9 +98,9 @@ CREATE TABLE IF NOT EXISTS `bookings` (
     `created_at`       DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at`       DATETIME        DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`booking_id`),
-    FOREIGN KEY (`customer_id`)    REFERENCES `users`(`user_id`)     ON DELETE RESTRICT,
-    FOREIGN KEY (`hall_id`)        REFERENCES `hall`(`hall_id`)      ON DELETE RESTRICT,
-    FOREIGN KEY (`sub_package_id`) REFERENCES `packages`(`package_id`) ON DELETE RESTRICT
+    FOREIGN KEY (`customer_id`) REFERENCES `users`(`user_id`)       ON DELETE RESTRICT,
+    FOREIGN KEY (`hall_id`)      REFERENCES `hall`(`hall_id`)        ON DELETE RESTRICT,
+    FOREIGN KEY (`package_id`)   REFERENCES `packages`(`package_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ─── 6. payments ────────────────────────────────────────────

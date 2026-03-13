@@ -99,7 +99,7 @@ function checkAvailability(PDO $pdo, string $startDate, string $startTime, strin
         // Conflict if any existing booking's date range overlaps the requested range
         $stmt = $pdo->prepare(
             "SELECT COUNT(*) FROM bookings
-             WHERE sub_package_id = ?
+             WHERE package_id = ?
                AND event_date <= ?
                AND COALESCE(end_date, event_date) >= ?
                AND status NOT IN ('rejected','cancelled')
@@ -160,44 +160,29 @@ function logActivity(PDO $pdo, string $action, int $userId): void
 // ─── Package helpers ─────────────────────────────────────────────────────────
 
 /**
- * Fetch all active packages for a hall, grouped by main → sub-packages.
+ * Fetch all active packages for a hall as a flat list.
  * Used by: booking form (Afrina, Module 4) and customer packages page (Riffna, Module 2).
  *
- * @return array  Array of main-package rows, each with a 'sub_packages' key
- *                containing its active children. Services are decoded to an array
- *                at 'services_arr' on each sub-package row.
+ * @return array  Flat array of active package rows. Services decoded to 'services_arr'.
  */
 function getPackagesByHall(PDO $pdo, int $hallId): array
 {
-    $mainStmt = $pdo->prepare(
+    $stmt = $pdo->prepare(
         "SELECT * FROM packages
-         WHERE hall_id = ? AND type = 'main' AND is_active = 1
-         ORDER BY package_id ASC"
+         WHERE hall_id = ? AND is_active = 1
+         ORDER BY price ASC"
     );
-    $mainStmt->execute([$hallId]);
-    $mains = $mainStmt->fetchAll();
+    $stmt->execute([$hallId]);
+    $packages = $stmt->fetchAll();
 
-    $result = [];
-    foreach ($mains as $main) {
-        $subStmt = $pdo->prepare(
-            "SELECT * FROM packages
-             WHERE parent_package_id = ? AND type = 'sub' AND is_active = 1
-             ORDER BY price ASC"
-        );
-        $subStmt->execute([$main['package_id']]);
-        $subs = $subStmt->fetchAll();
-
-        foreach ($subs as &$s) {
-            $s['services_arr'] = [];
-            if (!empty($s['services'])) {
-                $decoded = json_decode($s['services'], true);
-                if (is_array($decoded)) $s['services_arr'] = $decoded;
-            }
+    foreach ($packages as &$pkg) {
+        $pkg['services_arr'] = [];
+        if (!empty($pkg['services'])) {
+            $decoded = json_decode($pkg['services'], true);
+            if (is_array($decoded)) $pkg['services_arr'] = $decoded;
         }
-        unset($s);
-
-        $result[] = array_merge($main, ['sub_packages' => $subs]);
     }
+    unset($pkg);
 
-    return $result;
+    return $packages;
 }

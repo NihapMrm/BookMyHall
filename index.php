@@ -1,8 +1,8 @@
 ﻿<?php
 /**
- * index.php â€” Public landing page for BookMyHall.
+ * index.php  -  Public landing page for BookMyHall.
  * Shows hall overview, packages teaser, and CTA buttons.
- * Module 1 â€“ Sahani (landing page shell; hall/package data wired in Module 2)
+ * Module 1  Sahani (landing page shell; hall/package data wired in Module 2)
  */
 require_once __DIR__ . '/config/config.php';
 
@@ -18,12 +18,12 @@ $isAdmin      = isset($_SESSION['admin_id']) && ($_SESSION['role'] ?? '') === 'a
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BookMyHall â€” Lee Maridean Banquet Hall</title>
+    <title>BookMyHall  -  Lee Maridean Banquet Hall</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/customer/customer_global.css" />
     <style>
-        /* â”€â”€ Hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+        /*  Hero  */
         .hero {
             background: linear-gradient(135deg, #1a1f4e 0%, #4d5dfb 100%);
             color: #fff;
@@ -69,7 +69,7 @@ $isAdmin      = isset($_SESSION['admin_id']) && ($_SESSION['role'] ?? '') === 'a
         }
         .btn-hero-outline:hover { background: rgba(255,255,255,.1); border-color: #fff; }
 
-        /* â”€â”€ Features strip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+        /*  Features strip  */
         .features-strip {
             display: flex;
             justify-content: center;
@@ -90,13 +90,13 @@ $isAdmin      = isset($_SESSION['admin_id']) && ($_SESSION['role'] ?? '') === 'a
         .feature-item:last-child { border-right: none; }
         .feature-item i { font-size: 22px; color: #4d5dfb; }
 
-        /* â”€â”€ Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+        /*  Section  */
         .section { padding: 80px 40px; max-width: 1100px; margin: 0 auto; }
         .section-label { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #4d5dfb; margin-bottom: 12px; }
         .section-title { font-size: clamp(24px, 4vw, 36px); font-weight: 700; margin: 0 0 16px; line-height: 1.25; }
         .section-sub   { font-size: 16px; color: #6c6f83; max-width: 600px; line-height: 1.65; }
 
-        /* â”€â”€ Hall card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+        /*  Hall card  */
         .hall-card {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -120,7 +120,7 @@ $isAdmin      = isset($_SESSION['admin_id']) && ($_SESSION['role'] ?? '') === 'a
         .hall-stat .val  { font-size: 22px; font-weight: 700; }
         .hall-stat .lbl  { font-size: 12px; color: #6c6f83; margin-top: 2px; }
 
-        /* â”€â”€ Package cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+        /*  Package cards  */
         .packages-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 40px; }
         .pkg-card {
             background: #fff;
@@ -141,12 +141,12 @@ $isAdmin      = isset($_SESSION['admin_id']) && ($_SESSION['role'] ?? '') === 'a
         .pkg-price { font-size: 22px; font-weight: 700; color: #4d5dfb; }
         .pkg-price span { font-size: 13px; font-weight: 400; color: #6c6f83; }
 
-        /* â”€â”€ CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+        /*  CTA  */
         .cta-section { background: linear-gradient(135deg, #1a1f4e, #4d5dfb); color: #fff; padding: 80px 40px; text-align: center; }
         .cta-section h2 { font-size: 36px; font-weight: 700; margin: 0 0 16px; }
         .cta-section p  { font-size: 17px; opacity: .85; margin: 0 0 36px; }
 
-        /* â”€â”€ Responsive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+        /*  Responsive  */
         @media (max-width: 768px) {
             .hero { padding: 70px 20px; }
             .features-strip .feature-item { padding: 16px 20px; }
@@ -173,7 +173,7 @@ include __DIR__ . '/customer/includes/customer_topbar.php';
             <i class="fa-solid fa-star"></i> Lee Maridean Banquet Hall
         </div>
         <h1>Your Perfect Event Venue, Booked in Minutes</h1>
-        <p>Check real-time availability, choose your package, and secure your reservation â€” all online, all hassle-free.</p>
+        <p>Check real-time availability, choose your package, and secure your reservation  -  all online, all hassle-free.</p>
         <div class="hero-actions">
             <?php if ($isLoggedIn): ?>
                 <a href="<?= BASE_URL ?>/customer/bookings/book_hall.php" class="btn-hero-primary">
@@ -188,7 +188,7 @@ include __DIR__ . '/customer/includes/customer_topbar.php';
                 </a>
             <?php else: ?>
                 <a href="<?= BASE_URL ?>/customer/auth/register.php" class="btn-hero-primary">
-                    <i class="fa-solid fa-user-plus"></i> Get Started â€” Free
+                    <i class="fa-solid fa-user-plus"></i> Get Started  -  Free
                 </a>
                 <a href="<?= BASE_URL ?>/customer/hall/view_packages.php" class="btn-hero-outline">
                     <i class="fa-solid fa-box-open"></i> View Packages
@@ -198,7 +198,7 @@ include __DIR__ . '/customer/includes/customer_topbar.php';
     </div>
 </section>
 
-<!-- â”€â”€ Feature strip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!--  Feature strip  -->
 <div class="features-strip">
     <div class="feature-item"><i class="fa-solid fa-bolt"></i> Instant Confirmation</div>
     <div class="feature-item"><i class="fa-solid fa-calendar-check"></i> Real-Time Availability</div>
@@ -206,7 +206,7 @@ include __DIR__ . '/customer/includes/customer_topbar.php';
     <div class="feature-item"><i class="fa-solid fa-headset"></i> Dedicated Support</div>
 </div>
 
-<!-- â”€â”€ About the hall â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!-- About the hall -->
 <div class="section">
     <p class="section-label">About the Venue</p>
     <h2 class="section-title">Lee Maridean Banquet Hall</h2>
@@ -225,7 +225,7 @@ include __DIR__ . '/customer/includes/customer_topbar.php';
             </div>
             <p style="font-size:15px; color:#6c6f83; line-height:1.7;">
                 Fully air-conditioned with a grand stage, professional sound system, dedicated bridal suite,
-                ample parking, and expert catering options â€” everything your event deserves.
+                ample parking, and expert catering options  -  everything your event deserves.
             </p>
             <a href="<?= BASE_URL ?>/customer/hall/view_hall.php" class="btn btn-outline" style="margin-top:16px;">
                 <i class="fa-solid fa-arrow-right"></i> Learn More
@@ -234,52 +234,8 @@ include __DIR__ . '/customer/includes/customer_topbar.php';
     </div>
 </div>
 
-<!-- â”€â”€ Packages teaser â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-<div style="background:#f5f7fd; padding: 1px 0;">
-<div class="section">
-    <p class="section-label">Our Packages</p>
-    <h2 class="section-title">Choose What's Right for Your Event</h2>
-    <p class="section-sub">Flexible packages to suit every occasion and budget. Full details and pricing are available on the packages page.</p>
 
-    <div class="packages-grid">
-        <div class="pkg-card">
-            <div class="pkg-icon">ðŸ’</div>
-            <div class="pkg-name">Wedding Package</div>
-            <div class="pkg-desc">Complete wedding reception setup including catering, decoration, bridal suite, sound system, and flower arrangements.</div>
-            <div class="pkg-price">From LKR 50,000 <span>/ event</span></div>
-            <a href="<?= BASE_URL ?>/customer/hall/view_packages.php" class="btn btn-primary btn-sm">
-                View Sub-Packages <i class="fa-solid fa-arrow-right"></i>
-            </a>
-        </div>
-        <div class="pkg-card featured">
-            <div class="pkg-icon">ðŸ¢</div>
-            <div class="pkg-name">Corporate Package</div>
-            <div class="pkg-desc">Professional setup for conferences, seminars, and corporate events with projectors, Wi-Fi, and catering options.</div>
-            <div class="pkg-price">From LKR 35,000 <span>/ event</span></div>
-            <a href="<?= BASE_URL ?>/customer/hall/view_packages.php" class="btn btn-primary btn-sm">
-                View Sub-Packages <i class="fa-solid fa-arrow-right"></i>
-            </a>
-        </div>
-        <div class="pkg-card">
-            <div class="pkg-icon">ðŸŽ‰</div>
-            <div class="pkg-name">Social Events Package</div>
-            <div class="pkg-desc">Perfect for birthdays, anniversaries, and family gatherings with customizable decoration and catering themes.</div>
-            <div class="pkg-price">From LKR 20,000 <span>/ event</span></div>
-            <a href="<?= BASE_URL ?>/customer/hall/view_packages.php" class="btn btn-primary btn-sm">
-                View Sub-Packages <i class="fa-solid fa-arrow-right"></i>
-            </a>
-        </div>
-    </div>
-
-    <div style="text-align:center; margin-top:32px;">
-        <a href="<?= BASE_URL ?>/customer/hall/view_packages.php" class="btn btn-primary">
-            <i class="fa-solid fa-box-open"></i> View All Packages & Pricing
-        </a>
-    </div>
-</div>
-</div>
-
-<!-- â”€â”€ CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!-- CTA  -->
 <div class="cta-section">
     <h2>Ready to Book Your Date?</h2>
     <p>Join hundreds of happy clients who chose BookMyHall for their special events.</p>
@@ -294,13 +250,13 @@ include __DIR__ . '/customer/includes/customer_topbar.php';
     <?php endif; ?>
 </div>
 
-<!-- â”€â”€ Footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!--  Footer -->
 <footer class="site-footer">
-    <p>&copy; <?= date('Y') ?> BookMyHall â€” Lee Maridean Banquet Hall. All rights reserved.</p>
+    <p>&copy; <?= date('Y') ?> BookMyHall  -  Lee Maridean Banquet Hall. All rights reserved.</p>
 </footer>
 
 <script src="<?= BASE_URL ?>/assets/js/main.js"></script>
 
-</div><!-- /.c-content-wrapper -->
+</div>
 </body>
 </html>

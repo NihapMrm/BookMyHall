@@ -22,14 +22,12 @@ try {
                 p.name  AS package_name,
                 p.price AS package_price,
                 p.seat_capacity, p.parking_capacity,
-                mp.name AS main_package_name,
                 h.name  AS hall_name, h.location AS hall_location,
                 u.full_name AS customer_name
          FROM bookings b
-         JOIN packages p  ON p.package_id = b.sub_package_id
-         JOIN packages mp ON mp.package_id = p.parent_package_id
-         JOIN hall h      ON h.hall_id = b.hall_id
-         JOIN users u     ON u.user_id = b.customer_id
+         JOIN packages p ON p.package_id = b.package_id
+         JOIN hall h     ON h.hall_id = b.hall_id
+         JOIN users u    ON u.user_id = b.customer_id
          WHERE b.booking_id = ? AND b.customer_id = ? AND b.is_deleted = 0
          LIMIT 1"
     );
@@ -177,9 +175,7 @@ $pageSubtitle = 'Reservation details & status';
                     <dd><?= htmlspecialchars($booking['hall_name']) ?></dd>
                     <dt>Location</dt>
                     <dd><?= htmlspecialchars($booking['hall_location'] ?? '—') ?></dd>
-                    <dt>Package Group</dt>
-                    <dd><?= htmlspecialchars($booking['main_package_name']) ?></dd>
-                    <dt>Package Selected</dt>
+                    <dt>Package</dt>
                     <dd><?= htmlspecialchars($booking['package_name']) ?></dd>
                     <dt>Seat Capacity</dt>
                     <dd><?= (int)$booking['seat_capacity'] ?></dd>

@@ -1,5 +1,28 @@
 /* ─── Admin Bookings & Calendar ─────────────────────────────────────────────── */
 
+/* ─── Inline Status Select ──────────────────────────────────────────────────── */
+.status-select {
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 4px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    transition: opacity .15s, box-shadow .15s;
+    box-shadow: 0 0 0 1.5px transparent;
+}
+.status-select:focus   { box-shadow: 0 0 0 2px rgba(77,93,251,.25); }
+.status-select:disabled { opacity: .55; cursor: not-allowed; }
+.status-select.pending   { background: rgba(243,156,18,.15);  color: #d68910; }
+.status-select.approved  { background: rgba(46,204,113,.15);  color: #1e8449; }
+.status-select.rejected  { background: rgba(231,76,60,.15);   color: #c0392b; }
+.status-select.cancelled { background: rgba(108,111,131,.15); color: #555770; }
+.status-select.completed { background: rgba(52,152,219,.15);  color: #2874a6; }
+
 /* ─── Stats Row ─────────────────────────────────────────────────────────────── */
 .booking-stats {
     display: grid;
