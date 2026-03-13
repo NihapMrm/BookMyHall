@@ -2,7 +2,7 @@
 /**
  * view_packages.php — Customer: Browse Active Packages
  * Module 2 – Riffna
- * Shows all active main packages with their active sub-packages.
+ * Shows all active packages as a flat grid.
  * Public (no login required); "Book Now" requires login.
  */
 require_once __DIR__ . '/../../config/config.php';
@@ -13,12 +13,12 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 
 $isLoggedIn = isset($_SESSION['customer_id']);
 $hall       = null;
-$mainPkgs   = [];
+$packages   = [];
 
 try {
     $hall = $pdo->query("SELECT * FROM hall LIMIT 1")->fetch();
     if ($hall) {
-        $mainPkgs = getPackagesByHall($pdo, (int)$hall['hall_id']);
+        $packages = getPackagesByHall($pdo, (int)$hall['hall_id']);
     }
 } catch (PDOException $e) {
     error_log("view_packages: " . $e->getMessage());
@@ -55,7 +55,7 @@ include __DIR__ . '/../includes/customer_topbar.php';
 <div class="c-content-wrapper">
 <div class="customer-content">
 
-    <?php if (!$hall || empty($mainPkgs)): ?>
+    <?php if (!$hall || empty($packages)): ?>
     <!-- No packages yet -->
     <div style="text-align:center; padding:80px 20px;">
         <i class="fa-solid fa-box-open" style="font-size:56px; color:#c9d0fd;"></i>
@@ -67,83 +67,64 @@ include __DIR__ . '/../includes/customer_topbar.php';
     <?php else: ?>
 
     <div class="packages-section">
-        <?php foreach ($mainPkgs as $main): ?>
-        <div class="main-pkg-panel">
-            <div class="main-pkg-panel-header">
-                <h3><?= htmlspecialchars($main['name']) ?></h3>
-                <?php if ($main['description']): ?>
-                <p><?= htmlspecialchars($main['description']) ?></p>
+        <?php foreach ($packages as $pkg): ?>
+        <div class="sub-pkg-card">
+            <div class="spkg-name"><?= htmlspecialchars($pkg['name']) ?></div>
+
+            <?php if ($pkg['description']): ?>
+            <div class="spkg-desc"><?= htmlspecialchars($pkg['description']) ?></div>
+            <?php endif; ?>
+
+            <?php if ($pkg['seat_capacity'] || $pkg['parking_capacity']): ?>
+            <div class="spkg-meta">
+                <?php if ($pkg['seat_capacity']): ?>
+                <span><i class="fa-solid fa-users"></i> <?= number_format($pkg['seat_capacity']) ?> guests</span>
+                <?php endif; ?>
+                <?php if ($pkg['parking_capacity']): ?>
+                <span><i class="fa-solid fa-square-parking"></i> <?= number_format($pkg['parking_capacity']) ?> parking</span>
                 <?php endif; ?>
             </div>
+            <?php endif; ?>
 
-            <?php if (empty($main['sub_packages'])): ?>
-            <div style="padding:24px; color:#6c6f83; font-size:14px; font-style:italic;">
-                Sub-packages for this category are being finalized. Check back soon.
-            </div>
-            <?php else: ?>
-            <div class="sub-pkg-cards">
-                <?php foreach ($main['sub_packages'] as $sub): ?>
-                <div class="sub-pkg-card">
-                    <div class="spkg-name"><?= htmlspecialchars($sub['name']) ?></div>
-
-                    <?php if ($sub['description']): ?>
-                    <div class="spkg-desc"><?= htmlspecialchars($sub['description']) ?></div>
+            <?php if (!empty($pkg['services_arr'])): ?>
+            <div class="spkg-services">
+                <?php foreach ($pkg['services_arr'] as $svc): ?>
+                    <?php if (isset($serviceIconMap[$svc])): ?>
+                    <span class="svc-badge">
+                        <i class="fa-solid <?= $serviceIconMap[$svc]['icon'] ?>"></i>
+                        <?= $serviceIconMap[$svc]['label'] ?>
+                    </span>
                     <?php endif; ?>
-
-                    <?php if ($sub['seat_capacity'] || $sub['parking_capacity']): ?>
-                    <div class="spkg-meta">
-                        <?php if ($sub['seat_capacity']): ?>
-                        <span><i class="fa-solid fa-users"></i> <?= number_format($sub['seat_capacity']) ?> guests</span>
-                        <?php endif; ?>
-                        <?php if ($sub['parking_capacity']): ?>
-                        <span><i class="fa-solid fa-square-parking"></i> <?= number_format($sub['parking_capacity']) ?> parking</span>
-                        <?php endif; ?>
-                    </div>
-                    <?php endif; ?>
-
-                    <?php if (!empty($sub['services_arr'])): ?>
-                    <div class="spkg-services">
-                        <?php foreach ($sub['services_arr'] as $svc): ?>
-                            <?php if (isset($serviceIconMap[$svc])): ?>
-                            <span class="svc-badge">
-                                <i class="fa-solid <?= $serviceIconMap[$svc]['icon'] ?>"></i>
-                                <?= $serviceIconMap[$svc]['label'] ?>
-                            </span>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    </div>
-                    <?php endif; ?>
-
-                    <?php if ($sub['inclusions']): ?>
-                    <div style="font-size:12px; color:#6c6f83; line-height:1.6; border-top:1px solid #eaedf7; padding-top:8px;">
-                        <?= nl2br(htmlspecialchars($sub['inclusions'])) ?>
-                    </div>
-                    <?php endif; ?>
-
-                    <div class="spkg-footer">
-                        <div class="spkg-price">
-                            <?= formatCurrency($sub['price']) ?><br>
-                            <small>per event</small>
-                        </div>
-                        <?php if ($hall['status'] === 'available'): ?>
-                            <?php if ($isLoggedIn): ?>
-                            <a href="<?= BASE_URL ?>/customer/bookings/book_hall.php?package=<?= $sub['package_id'] ?>"
-                               class="btn btn-primary btn-sm">
-                                Book Now <i class="fa-solid fa-arrow-right"></i>
-                            </a>
-                            <?php else: ?>
-                            <a href="<?= BASE_URL ?>/customer/auth/customer_login.php" class="btn btn-primary btn-sm">
-                                Sign In to Book
-                            </a>
-                            <?php endif; ?>
-                        <?php else: ?>
-                        <span class="badge-status cancelled" style="font-size:11px;">Unavailable</span>
-                        <?php endif; ?>
-                    </div>
-                </div>
                 <?php endforeach; ?>
             </div>
             <?php endif; ?>
+
+            <?php if ($pkg['inclusions']): ?>
+            <div style="font-size:12px; color:#6c6f83; line-height:1.6; border-top:1px solid #eaedf7; padding-top:8px;">
+                <?= nl2br(htmlspecialchars($pkg['inclusions'])) ?>
+            </div>
+            <?php endif; ?>
+
+            <div class="spkg-footer">
+                <div class="spkg-price">
+                    <?= formatCurrency($pkg['price']) ?><br>
+                    <small>per event</small>
+                </div>
+                <?php if ($hall['status'] === 'available'): ?>
+                    <?php if ($isLoggedIn): ?>
+                    <a href="<?= BASE_URL ?>/customer/bookings/book_hall.php?package=<?= $pkg['package_id'] ?>"
+                       class="btn btn-primary btn-sm">
+                        Book Now <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <?php else: ?>
+                    <a href="<?= BASE_URL ?>/customer/auth/customer_login.php" class="btn btn-primary btn-sm">
+                        Sign In to Book
+                    </a>
+                    <?php endif; ?>
+                <?php else: ?>
+                <span class="badge-status cancelled" style="font-size:11px;">Unavailable</span>
+                <?php endif; ?>
+            </div>
         </div>
         <?php endforeach; ?>
     </div>

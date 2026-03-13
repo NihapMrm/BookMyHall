@@ -15,6 +15,17 @@ $subtitle = $subtitle ?: "$greeting, " . htmlspecialchars($_SESSION['full_name']
 // Avatar initials fallback
 $name     = $_SESSION['full_name'] ?? 'Admin';
 $initials = strtoupper(implode('', array_map(fn($w) => $w[0], array_slice(explode(' ', $name), 0, 2))));
+
+// Pages where the search bar should be hidden
+$_hideSearchPages = [
+    'dashboard.php',
+    'manage_hall.php', 'edit_hall.php', 'manage_images.php',
+    'manage_packages.php', 'add_package.php', 'edit_package.php',
+    'booking_report.php', 'income_report.php', 'monthly_report.php',
+    'utilization_report.php', 'customer_report.php', 'export_report.php',
+    'admin_profile.php',
+];
+$_showSearch = !in_array(basename($_SERVER['PHP_SELF']), $_hideSearchPages, true);
 ?>
 
 <header class="topbar">
@@ -24,6 +35,7 @@ $initials = strtoupper(implode('', array_map(fn($w) => $w[0], array_slice(explod
             <p class="topbar__subtitle"><?= htmlspecialchars($subtitle) ?></p>
         </div>
 
+        <?php if ($_showSearch): ?>
         <form class="topbar__search" role="search" action="#" method="GET">
             <label class="sr-only" for="admin-search">Search</label>
             <input id="admin-search" type="search" name="q"
@@ -33,14 +45,10 @@ $initials = strtoupper(implode('', array_map(fn($w) => $w[0], array_slice(explod
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </form>
+        <?php endif; ?>
     </div>
 
     <div class="topbar__right">
-        <!-- Notifications (badge wired in Phase 4) -->
-        <button class="topbar__icon-button" aria-label="Notifications">
-            <i class="fa-solid fa-bell"></i>
-        </button>
-
         <!-- Profile dropdown -->
         <div class="topbar__profile" role="button" aria-haspopup="true" aria-expanded="false" tabindex="0">
             <div class="topbar__avatar-placeholder" aria-hidden="true"><?= htmlspecialchars($initials) ?></div>

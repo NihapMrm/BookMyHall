@@ -18,7 +18,7 @@ try {
                 b.status, b.event_type, b.guest_count,
                 p.name AS package_name
          FROM bookings b
-         JOIN packages p ON p.package_id = b.sub_package_id
+         JOIN packages p ON p.package_id = b.package_id
          WHERE b.customer_id = ? AND b.is_deleted = 0
          ORDER BY b.event_date ASC"
     );

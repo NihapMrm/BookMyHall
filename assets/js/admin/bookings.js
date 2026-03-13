@@ -11,12 +11,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnCal    = document.getElementById('btn-view-cal');
     const btnTable  = document.getElementById('btn-view-table');
 
+    const calFilterWrap = document.getElementById('cal-filter-wrap');
+
     if (btnCal && btnTable) {
         btnCal.addEventListener('click', function () {
             calView.style.display   = 'block';
             tableView.style.display = 'none';
             btnCal.classList.add('active');
             btnTable.classList.remove('active');
+            if (calFilterWrap) calFilterWrap.style.display = 'block';
             localStorage.setItem('bk_view', 'calendar');
         });
 
@@ -25,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tableView.style.display = 'block';
             btnTable.classList.add('active');
             btnCal.classList.remove('active');
+            if (calFilterWrap) calFilterWrap.style.display = 'none';
             localStorage.setItem('bk_view', 'table');
         });
 
@@ -39,11 +43,57 @@ document.addEventListener('DOMContentLoaded', function () {
         initAdminCalendar(BOOKING_DATA);
     }
 
-    /* ─── Confirm dialogs for approve/reject/complete actions ───────────────── */
-    document.querySelectorAll('[data-confirm]').forEach(function (el) {
-        el.addEventListener('click', function (e) {
-            if (!confirm(el.dataset.confirm)) e.preventDefault();
+    /* ─── Auto-submit table filters ───────────────────────────────────────── */
+    const filterForm = document.getElementById('filter-form');
+    if (filterForm) {
+        // Debounced submit for text search
+        const searchInput = filterForm.querySelector('input[name="q"]');
+        if (searchInput) {
+            let debounceTimer;
+            searchInput.addEventListener('input', function () {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(function () { filterForm.submit(); }, 500);
+            });
+        }
+        // Immediate submit for selects and date inputs
+        filterForm.querySelectorAll('select, input[type="date"]').forEach(function (el) {
+            el.addEventListener('change', function () { filterForm.submit(); });
         });
+    }
+
+    /* ─── Inline status change via AJAX ───────────────────────────────────── */
+    document.addEventListener('change', function (e) {
+        const sel = e.target.closest('.status-select');
+        if (!sel) return;
+
+        const bookingId = sel.dataset.bookingId;
+        const newStatus = sel.value;
+        const prevStatus = sel.dataset.prevStatus;
+
+        sel.disabled = true;
+
+        fetch(BASE_URL + '/admin/bookings/update_status.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'booking_id=' + encodeURIComponent(bookingId) + '&status=' + encodeURIComponent(newStatus)
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data.success) {
+                sel.className    = 'status-select ' + newStatus;
+                sel.dataset.prevStatus = newStatus;
+            } else {
+                sel.value        = prevStatus;
+                sel.className    = 'status-select ' + prevStatus;
+                alert('Could not update status: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(function () {
+            sel.value     = prevStatus;
+            sel.className = 'status-select ' + prevStatus;
+            alert('Network error. Please try again.');
+        })
+        .finally(function () { sel.disabled = false; });
     });
 });
 

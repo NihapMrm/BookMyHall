@@ -20,9 +20,6 @@ function sidebarLink(string $href, string $icon, string $label, string $currentP
 <aside class="sidebar">
     <!-- Brand -->
     <div class="sidebar__brand">
-        <button class="sidebar__menu-toggle" aria-label="Toggle sidebar">
-            <span></span><span></span><span></span>
-        </button>
         <span class="sidebar__brand-icon">
             <i class="fa-solid fa-building-columns"></i>
         </span>

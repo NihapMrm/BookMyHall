@@ -58,7 +58,7 @@ try {
                 b.status, b.total_amount, b.advance_amount, b.balance_amount,
                 b.event_type, p.name AS package_name
          FROM bookings b
-         LEFT JOIN packages p ON p.package_id = b.sub_package_id
+         LEFT JOIN packages p ON p.package_id = b.package_id
          WHERE b.customer_id = ? AND b.is_deleted = 0
          ORDER BY b.created_at DESC
          LIMIT 10"

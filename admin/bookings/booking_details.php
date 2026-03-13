@@ -21,13 +21,11 @@ try {
                 u.full_name AS customer_name, u.email AS customer_email,
                 u.phone AS customer_phone,
                 h.name AS hall_name,
-                p.name AS package_name, p.price AS package_price,
-                mp.name AS main_package_name
+                p.name AS package_name, p.price AS package_price
          FROM bookings b
          JOIN users u    ON u.user_id    = b.customer_id
          JOIN hall h     ON h.hall_id    = b.hall_id
-         JOIN packages p ON p.package_id = b.sub_package_id
-         LEFT JOIN packages mp ON mp.package_id = p.parent_package_id
+         JOIN packages p ON p.package_id = b.package_id
          WHERE b.booking_id = ? AND b.is_deleted = 0"
     );
     $stmt->execute([$bookingId]);
@@ -212,11 +210,7 @@ $pageSubtitle = 'Full booking record and actions';
                 <span class="detail-value"><?= htmlspecialchars($booking['hall_name']) ?></span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Main Package</span>
-                <span class="detail-value"><?= htmlspecialchars($booking['main_package_name'] ?: '—') ?></span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Sub Package</span>
+                <span class="detail-label">Package</span>
                 <span class="detail-value"><?= htmlspecialchars($booking['package_name']) ?></span>
             </div>
         </div>

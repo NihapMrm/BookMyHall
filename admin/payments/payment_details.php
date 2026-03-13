@@ -29,7 +29,7 @@ try {
          FROM payments p
          JOIN bookings b  ON b.booking_id  = p.booking_id
          JOIN users u     ON u.user_id     = b.customer_id
-         JOIN packages pkg ON pkg.package_id = b.sub_package_id
+         JOIN packages pkg ON pkg.package_id = b.package_id
          JOIN hall h      ON h.hall_id     = b.hall_id
          WHERE p.payment_id = ?"
     );

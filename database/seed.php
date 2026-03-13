@@ -24,23 +24,6 @@ function h2(string $msg): void  { echo "<h3 style='margin:20px 0 6px;font-family
 echo "<!DOCTYPE html><html><head><title>BookMyHall Seed</title></head><body style='font-family:sans-serif;max-width:700px;margin:30px auto;padding:0 20px;'>";
 echo "<h2 style='color:#4d5dfb;'>BookMyHall — Demo Data Seed</h2>";
 
-// ─── DB Migration: add end_date if missing (multi-day booking support) ────────
-h2('0. Schema Migration');
-try {
-    $colCheck = $pdo->query(
-        "SELECT COUNT(*) FROM information_schema.columns
-         WHERE table_schema = DATABASE() AND table_name = 'bookings' AND column_name = 'end_date'"
-    );
-    if ((int)$colCheck->fetchColumn() === 0) {
-        $pdo->exec("ALTER TABLE bookings ADD COLUMN end_date DATE NULL AFTER event_date");
-        ok('Added end_date column to bookings table');
-    } else {
-        skip('end_date column already exists in bookings table');
-    }
-} catch (PDOException $e) {
-    echo "<p style='color:red;'>⚠ Migration error: " . htmlspecialchars($e->getMessage()) . "</p>";
-}
-
 // ─── 1. Admin ────────────────────────────────────────────────────────────────
 h2('1. Admin Account');
 $adminEmail = 'admin@bookmyhall.com';
@@ -113,77 +96,54 @@ $pkgCheck = $pdo->query("SELECT COUNT(*) FROM packages WHERE hall_id = {$hallId}
 if ((int)$pkgCheck >= 4) {
     skip('Packages already exist — skipped.');
 
-    // Fetch existing sub-package IDs for bookings
-    $subs = $pdo->query(
-        "SELECT package_id FROM packages WHERE hall_id={$hallId} AND type='sub' ORDER BY package_id ASC"
+    // Fetch existing package IDs for bookings
+    $pkgs = $pdo->query(
+        "SELECT package_id FROM packages WHERE hall_id={$hallId} ORDER BY package_id ASC"
     )->fetchAll(PDO::FETCH_COLUMN);
-    [$pkgSilverBasic, $pkgSilverPlus, $pkgGoldStd, $pkgGoldPrem] = array_slice($subs, 0, 4);
+    [$pkgSilverBasic, $pkgSilverPlus, $pkgGoldStd, $pkgGoldPrem] = array_slice($pkgs, 0, 4);
 } else {
-    $insMain = $pdo->prepare(
-        "INSERT INTO packages (hall_id,name,type,price,seat_capacity,parking_capacity,description,inclusions,services,is_active)
-         VALUES (?,?,?,?,?,?,?,?,?,1)"
-    );
-    $insSub = $pdo->prepare(
-        "INSERT INTO packages (hall_id,parent_package_id,name,type,price,seat_capacity,parking_capacity,description,inclusions,services,is_active)
-         VALUES (?,?,?,?,?,?,?,?,?,?,1)"
+    $insPkg = $pdo->prepare(
+        "INSERT INTO packages (hall_id,name,price,seat_capacity,parking_capacity,description,inclusions,services,is_active)
+         VALUES (?,?,?,?,?,?,?,?,1)"
     );
 
-    // Main: Silver
-    $insMain->execute([
-        $hallId, 'Silver Package', 'main', 0.00, 300, 50,
-        'Our Silver Package is perfect for intimate gatherings and mid-size celebrations.',
-        'Hall rental, basic decor, standard seating arrangement',
-        json_encode(['ac','wifi']),
-    ]);
-    $mainSilver = (int)$pdo->lastInsertId();
-
-    // Sub: Silver Basic
-    $insSub->execute([
-        $hallId, $mainSilver, 'Silver Basic', 'sub', 85000.00, 200, 30,
+    // Silver Basic
+    $insPkg->execute([
+        $hallId, 'Silver Basic', 85000.00, 200, 30,
         'Ideal for smaller gatherings up to 200 guests.',
         'Hall rental (8 hrs), AC, basic table décor, standard chairs & tables, wifi, parking for 30 vehicles',
         json_encode(['ac','wifi','parking']),
     ]);
     $pkgSilverBasic = (int)$pdo->lastInsertId();
 
-    // Sub: Silver Plus
-    $insSub->execute([
-        $hallId, $mainSilver, 'Silver Plus', 'sub', 120000.00, 300, 50,
+    // Silver Plus
+    $insPkg->execute([
+        $hallId, 'Silver Plus', 120000.00, 300, 50,
         'Extended Silver experience for up to 300 guests with catering support.',
         'Hall rental (10 hrs), AC, catering setup area, enhanced décor, wifi, parking for 50 vehicles',
         json_encode(['ac','catering','wifi','parking']),
     ]);
     $pkgSilverPlus = (int)$pdo->lastInsertId();
 
-    // Main: Gold
-    $insMain->execute([
-        $hallId, 'Gold Package', 'main', 0.00, 550, 100,
-        'The Gold Package delivers a luxurious experience for large weddings and grand events.',
-        'Premium décor, catering, stage, sound system, bridal suite access',
-        json_encode(['ac','stage','catering','wifi','parking']),
-    ]);
-    $mainGold = (int)$pdo->lastInsertId();
-
-    // Sub: Gold Standard
-    $insSub->execute([
-        $hallId, $mainGold, 'Gold Standard', 'sub', 175000.00, 400, 80,
+    // Gold Standard
+    $insPkg->execute([
+        $hallId, 'Gold Standard', 175000.00, 400, 80,
         'Premium experience for up to 400 guests with full décor and catering.',
         'Hall rental (12 hrs), AC, full décor, catering setup, stage, professional sound system, wifi, parking for 80',
         json_encode(['ac','decoration','catering','stage','wifi','parking']),
     ]);
     $pkgGoldStd = (int)$pdo->lastInsertId();
 
-    // Sub: Gold Premium
-    $insSub->execute([
-        $hallId, $mainGold, 'Gold Premium', 'sub', 250000.00, 550, 100,
+    // Gold Premium
+    $insPkg->execute([
+        $hallId, 'Gold Premium', 250000.00, 550, 100,
         'The ultimate banquet experience for up to 550 guests — no detail spared.',
         'Hall rental (14 hrs), AC, luxury décor, full catering, stage, sound system, bridal suite, projector, wifi, parking for 100',
         json_encode(['ac','decoration','catering','stage','wifi','parking']),
     ]);
     $pkgGoldPrem = (int)$pdo->lastInsertId();
 
-    ok("Created: Silver Package → Silver Basic (ID:{$pkgSilverBasic}), Silver Plus (ID:{$pkgSilverPlus})");
-    ok("Created: Gold Package → Gold Standard (ID:{$pkgGoldStd}), Gold Premium (ID:{$pkgGoldPrem})");
+    ok("Created: Silver Basic (ID:{$pkgSilverBasic}), Silver Plus (ID:{$pkgSilverPlus}), Gold Standard (ID:{$pkgGoldStd}), Gold Premium (ID:{$pkgGoldPrem})");
 }
 
 // ─── 5. Bookings ─────────────────────────────────────────────────────────────
@@ -198,7 +158,7 @@ if ($bkCheck >= 8) {
 } else {
     $insBk = $pdo->prepare(
         "INSERT INTO bookings
-         (customer_id,hall_id,sub_package_id,event_date,end_date,start_time,end_time,
+         (customer_id,hall_id,package_id,event_date,end_date,start_time,end_time,
           event_type,guest_count,special_requests,
           total_amount,advance_amount,balance_amount,
           status,rejection_reason,cancellation_reason,is_deleted,completed_at,created_at)

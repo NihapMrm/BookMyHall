@@ -8,48 +8,36 @@ require_once __DIR__ . '/../../includes/db_connection.php';
 require_once __DIR__ . '/../../includes/functions.php';
 require_once __DIR__ . '/../../includes/session_guard.php';
 
-$hall    = null;
-$mainPkgs = [];
-$stats   = ['total' => 0, 'active' => 0, 'main' => 0, 'sub' => 0];
+$pageTitle    = 'Packages';
+$pageSubtitle = 'Manage event packages for the hall';
+
+$hall     = null;
+$packages = [];
+$stats    = ['total' => 0, 'active' => 0, 'bookings_this_month' => 0];
 
 try {
     $hall = $pdo->query("SELECT * FROM hall LIMIT 1")->fetch();
 
     if ($hall) {
-        // Fetch all packages ordered by main first, then sub
         $stmt = $pdo->prepare(
             "SELECT p.*,
                     (SELECT COUNT(*) FROM bookings b
-                     WHERE b.sub_package_id = p.package_id
+                     WHERE b.package_id = p.package_id
                        AND b.is_deleted = 0
                        AND MONTH(b.created_at) = MONTH(NOW())
                        AND YEAR(b.created_at)  = YEAR(NOW())
                     ) AS bookings_this_month
              FROM packages p
              WHERE p.hall_id = ?
-             ORDER BY p.type DESC, p.parent_package_id ASC, p.package_id ASC"
+             ORDER BY p.price ASC"
         );
         $stmt->execute([$hall['hall_id']]);
-        $allPkgs = $stmt->fetchAll();
+        $packages = $stmt->fetchAll();
 
-        // Group: main packages + their subs
-        $subs = [];
-        foreach ($allPkgs as $pkg) {
+        foreach ($packages as $pkg) {
             $stats['total']++;
             if ($pkg['is_active']) $stats['active']++;
-            if ($pkg['type'] === 'main') {
-                $stats['main']++;
-                $mainPkgs[$pkg['package_id']] = array_merge($pkg, ['sub_packages' => []]);
-            } else {
-                $stats['sub']++;
-                $subs[] = $pkg;
-            }
-        }
-        foreach ($subs as $sub) {
-            $pid = $sub['parent_package_id'];
-            if ($pid && isset($mainPkgs[$pid])) {
-                $mainPkgs[$pid]['sub_packages'][] = $sub;
-            }
+            $stats['bookings_this_month'] += (int)$pkg['bookings_this_month'];
         }
     }
 } catch (PDOException $e) {
@@ -63,7 +51,7 @@ $flash = getFlash();
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Manage Packages — <?= SITE_NAME ?></title>
+    <title>Packages — <?= SITE_NAME ?></title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous"/>
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/admin/admin_global.css"/>
@@ -78,7 +66,7 @@ $flash = getFlash();
         <div class="page-header">
             <div>
                 <h1 class="page-title">Packages</h1>
-                <p class="page-subtitle">Manage main packages and sub-packages for <?= htmlspecialchars($hall['name'] ?? 'the hall') ?>.</p>
+                <p class="page-subtitle">Manage event packages for <?= htmlspecialchars($hall['name'] ?? 'the hall') ?>.</p>
             </div>
             <a href="<?= BASE_URL ?>/admin/packages/add_package.php" class="btn btn-primary">
                 <i class="fa-solid fa-plus"></i> Add Package
@@ -109,108 +97,101 @@ $flash = getFlash();
                 </div>
             </div>
             <div class="pkg-stat-card">
-                <div class="ps-icon orange"><i class="fa-solid fa-layer-group"></i></div>
+                <div class="ps-icon orange"><i class="fa-solid fa-calendar-check"></i></div>
                 <div class="ps-info">
-                    <div class="ps-val"><?= $stats['main'] ?></div>
-                    <div class="ps-lbl">Main Packages</div>
-                </div>
-            </div>
-            <div class="pkg-stat-card">
-                <div class="ps-icon red"><i class="fa-solid fa-diagram-subtask"></i></div>
-                <div class="ps-info">
-                    <div class="ps-val"><?= $stats['sub'] ?></div>
-                    <div class="ps-lbl">Sub-Packages</div>
+                    <div class="ps-val"><?= $stats['bookings_this_month'] ?></div>
+                    <div class="ps-lbl">Bookings This Month</div>
                 </div>
             </div>
         </div>
 
-        <!-- Package Tree -->
-        <?php if (empty($mainPkgs)): ?>
+        <!-- Package List -->
+        <?php if (empty($packages)): ?>
             <div class="section-card" style="text-align:center; padding:60px 30px;">
                 <i class="fa-solid fa-box-open" style="font-size:48px; color:#c9d0fd;"></i>
                 <h3 style="margin:16px 0 8px;">No Packages Yet</h3>
-                <p style="color:var(--text-muted);">Add your first main package to get started.</p>
+                <p style="color:var(--text-muted);">Add your first package to get started.</p>
                 <a href="<?= BASE_URL ?>/admin/packages/add_package.php" class="btn btn-primary" style="margin-top:16px;">
                     <i class="fa-solid fa-plus"></i> Add Package
                 </a>
             </div>
         <?php else: ?>
-        <div class="pkg-tree">
-            <?php foreach ($mainPkgs as $main): ?>
-            <div class="main-pkg-block">
-                <div class="main-pkg-header">
-                    <div class="mpkg-icon"><i class="fa-solid fa-layer-group"></i></div>
-                    <div class="mpkg-name"><?= htmlspecialchars($main['name']) ?></div>
-                    <div class="mpkg-meta">
-                        <?php if ($main['description']): ?>
-                        <span style="max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                            <?= htmlspecialchars(substr($main['description'], 0, 60)) ?>...
-                        </span>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>Package Name</th>
+                    <th>Price</th>
+                    <th>Capacity</th>
+                    <th>Services</th>
+                    <th>Bookings (Month)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($packages as $pkg): ?>
+                <?php
+                    $services = [];
+                    if (!empty($pkg['services'])) {
+                        $decoded = json_decode($pkg['services'], true);
+                        if (is_array($decoded)) $services = $decoded;
+                    }
+                ?>
+                <tr>
+                    <td>
+                        <div style="font-weight:600;"><?= htmlspecialchars($pkg['name']) ?></div>
+                        <?php if ($pkg['description']): ?>
+                        <div style="font-size:.76rem; color:var(--text-muted); margin-top:2px;">
+                            <?= htmlspecialchars(mb_strimwidth($pkg['description'], 0, 60, '...')) ?>
+                        </div>
                         <?php endif; ?>
-                        <span class="sub-count"><?= count($main['sub_packages']) ?> sub-package<?= count($main['sub_packages']) !== 1 ? 's' : '' ?></span>
-                        <span class="badge-status <?= $main['is_active'] ? 'active' : 'cancelled' ?>">
-                            <?= $main['is_active'] ? 'Active' : 'Inactive' ?>
+                    </td>
+                    <td><?= formatCurrency($pkg['price']) ?></td>
+                    <td>
+                        <?php if ($pkg['seat_capacity']): ?>
+                        <span style="font-size:.82rem;"><i class="fa-solid fa-users" style="color:var(--primary);"></i> <?= number_format($pkg['seat_capacity']) ?></span>
+                        <?php endif; ?>
+                        <?php if ($pkg['parking_capacity']): ?>
+                        <span style="font-size:.82rem; margin-left:6px;"><i class="fa-solid fa-car" style="color:var(--text-muted);"></i> <?= number_format($pkg['parking_capacity']) ?></span>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                        <?php foreach ($services as $svc): ?>
+                            <span style="font-size:.72rem;background:var(--primary-light);color:var(--primary);padding:2px 8px;border-radius:20px;">
+                                <?= htmlspecialchars(ucfirst($svc)) ?>
+                            </span>
+                        <?php endforeach; ?>
+                        </div>
+                    </td>
+                    <td style="text-align:center;">
+                        <?php if ($pkg['bookings_this_month'] > 0): ?>
+                        <span style="font-size:.82rem;color:var(--info);"><?= (int)$pkg['bookings_this_month'] ?></span>
+                        <?php else: ?>
+                        <span style="color:var(--text-muted);">—</span>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <span class="badge-status <?= $pkg['is_active'] ? 'approved' : 'cancelled' ?>">
+                            <?= $pkg['is_active'] ? 'Active' : 'Inactive' ?>
                         </span>
-                        <a href="<?= BASE_URL ?>/admin/packages/edit_package.php?id=<?= $main['package_id'] ?>"
-                           class="btn btn-sm btn-outline" onclick="event.stopPropagation()">
+                    </td>
+                    <td>
+                        <div style="display: flex;gap: 10px;">
+                              <a href="<?= BASE_URL ?>/admin/packages/edit_package.php?id=<?= $pkg['package_id'] ?>" class="btn btn-sm btn-outline">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </a>
-                        <a href="<?= BASE_URL ?>/admin/packages/delete_package.php?id=<?= $main['package_id'] ?>"
-                           class="btn btn-sm btn-danger" onclick="event.stopPropagation()">
+                        <a href="<?= BASE_URL ?>/admin/packages/delete_package.php?id=<?= $pkg['package_id'] ?>" class="btn btn-sm btn-danger">
                             <i class="fa-solid fa-trash-can"></i>
-                        </a>
-                        <i class="fa-solid fa-chevron-down toggle-icon"></i>
-                    </div>
-                </div>
-
-                <div class="sub-pkg-list">
-                    <?php if (empty($main['sub_packages'])): ?>
-                        <div class="no-sub">
-                            No sub-packages yet —
-                            <a href="<?= BASE_URL ?>/admin/packages/add_package.php?parent=<?= $main['package_id'] ?>">
-                                Add one
-                            </a>
+                        </a>  
                         </div>
-                    <?php else: ?>
-                        <?php foreach ($main['sub_packages'] as $sub): ?>
-                        <div class="sub-pkg-row">
-                            <div class="tree-line"></div>
-                            <div class="spkg-name"><?= htmlspecialchars($sub['name']) ?></div>
-                            <div class="spkg-cap">
-                                <i class="fa-solid fa-users" style="font-size:12px;"></i>
-                                <?= $sub['seat_capacity'] ? number_format($sub['seat_capacity']) . ' pax' : '—' ?>
-                            </div>
-                            <div class="spkg-price"><?= formatCurrency($sub['price']) ?></div>
-                            <span class="badge-status <?= $sub['is_active'] ? 'active' : 'cancelled' ?>">
-                                <?= $sub['is_active'] ? 'Active' : 'Inactive' ?>
-                            </span>
-                            <?php if ($sub['bookings_this_month'] > 0): ?>
-                            <span style="font-size:12px; color:var(--info);">
-                                <i class="fa-solid fa-calendar-check"></i> <?= $sub['bookings_this_month'] ?> this month
-                            </span>
-                            <?php endif; ?>
-                            <div class="spkg-actions">
-                                <a href="<?= BASE_URL ?>/admin/packages/edit_package.php?id=<?= $sub['package_id'] ?>"
-                                   class="btn btn-sm btn-outline">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </a>
-                                <a href="<?= BASE_URL ?>/admin/packages/delete_package.php?id=<?= $sub['package_id'] ?>"
-                                   class="btn btn-sm btn-danger">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </a>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-                        <div style="padding:10px 0; text-align:right;">
-                            <a href="<?= BASE_URL ?>/admin/packages/add_package.php?parent=<?= $main['package_id'] ?>"
-                               class="btn btn-sm btn-outline">
-                                <i class="fa-solid fa-plus"></i> Add Sub-Package
-                            </a>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <?php endforeach; ?>
+                    
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
         <?php endif; ?>
 </main>
