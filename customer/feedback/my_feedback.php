@@ -8,6 +8,33 @@ require_once __DIR__ . '/../../includes/db_connection.php';
 require_once __DIR__ . '/../../includes/functions.php';
 require_once __DIR__ . '/../../includes/customer_session_guard.php';
 
+// Auto-migrate: create feedback table if missing
+try {
+    $tableCheck = $pdo->query(
+        "SELECT COUNT(*) FROM information_schema.tables
+         WHERE table_schema = DATABASE() AND table_name = 'feedback'"
+    );
+    if ((int)$tableCheck->fetchColumn() === 0) {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS `feedback` (
+                `feedback_id`  INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+                `booking_id`   INT UNSIGNED  NOT NULL,
+                `customer_id`  INT UNSIGNED  NOT NULL,
+                `rating`       TINYINT UNSIGNED NOT NULL DEFAULT 5 COMMENT '1–5 stars',
+                `comment`      TEXT          DEFAULT NULL,
+                `is_visible`   TINYINT(1)    NOT NULL DEFAULT 1,
+                `created_at`   DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (`feedback_id`),
+                UNIQUE KEY `uq_booking_feedback` (`booking_id`),
+                FOREIGN KEY (`booking_id`)  REFERENCES `bookings`(`booking_id`) ON DELETE CASCADE,
+                FOREIGN KEY (`customer_id`) REFERENCES `users`(`user_id`)       ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        ");
+    }
+} catch (PDOException $e) {
+    error_log('my_feedback migration: ' . $e->getMessage());
+}
+
 $customerId = (int)$_SESSION['customer_id'];
 $flash = getFlash();
 
@@ -27,6 +54,28 @@ try {
     $feedbacks = $stmt->fetchAll();
 } catch (PDOException $e) {
     error_log('my_feedback fetch: ' . $e->getMessage());
+}
+
+// Fetch completed bookings that don't have feedback yet (eligible for leaving feedback)
+$pendingFeedbackBookings = [];
+try {
+    $pendingStmt = $pdo->prepare(
+        "SELECT b.booking_id, b.event_date, b.event_type,
+                p.name AS package_name, h.name AS hall_name
+         FROM bookings b
+         JOIN packages p ON p.package_id = b.sub_package_id
+         JOIN hall h ON h.hall_id = b.hall_id
+         LEFT JOIN feedback f ON f.booking_id = b.booking_id
+         WHERE b.customer_id = ?
+           AND b.is_deleted = 0
+           AND f.booking_id IS NULL
+           AND b.status IN ('completed','approved')
+         ORDER BY b.event_date DESC"
+    );
+    $pendingStmt->execute([$customerId]);
+    $pendingFeedbackBookings = $pendingStmt->fetchAll();
+} catch (PDOException $e) {
+    error_log('my_feedback pending fetch: ' . $e->getMessage());
 }
 
 $pageTitle    = 'My Feedback';
@@ -58,7 +107,7 @@ $pageSubtitle = 'Your reviews and ratings';
     </div>
     <?php endif; ?>
 
-    <?php if (empty($feedbacks)): ?>
+    <?php if (empty($feedbacks) && empty($pendingFeedbackBookings)): ?>
     <div style="text-align:center;padding:60px 20px;color:var(--text-muted);">
         <i class="fa-solid fa-star" style="font-size:3rem;color:var(--warning);margin-bottom:14px;display:block;opacity:.4;"></i>
         <p style="font-size:1.05rem;margin-bottom:18px;">You haven't submitted any feedback yet.</p>
@@ -68,6 +117,42 @@ $pageSubtitle = 'Your reviews and ratings';
     </div>
 
     <?php else: ?>
+
+    <?php if (!empty($pendingFeedbackBookings)): ?>
+    <div class="feedback-pending-section" style="margin-bottom:32px;">
+        <h2 style="margin-bottom:16px;">Leave Feedback</h2>
+        <div class="feedback-item-list">
+            <?php foreach ($pendingFeedbackBookings as $pb): ?>
+            <div class="feedback-item-card">
+                <div class="feedback-item-body">
+                    <div class="feedback-item-meta">
+                        <span class="feedback-item-pkg"><?= htmlspecialchars($pb['package_name']) ?></span>
+                        <span class="feedback-item-date">
+                            <i class="fa-solid fa-calendar-day"></i>
+                            <?= htmlspecialchars(formatDateReadable($pb['event_date'])) ?>
+                            <?php if ($pb['event_type']): ?>
+                            &nbsp;·&nbsp; <?= htmlspecialchars($pb['event_type']) ?>
+                            <?php endif; ?>
+                        </span>
+                        <span class="feedback-item-location">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <?= htmlspecialchars($pb['hall_name']) ?>
+                        </span>
+                    </div>
+                </div>
+                <div class="feedback-item-actions">
+                    <a href="<?= BASE_URL ?>/customer/feedback/submit_feedback.php?booking_id=<?= (int)$pb['booking_id'] ?>"
+                       class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-star"></i> Leave Feedback
+                    </a>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <?php if (!empty($feedbacks)): ?>
 
     <div class="feedback-item-list">
         <?php foreach ($feedbacks as $fb): ?>
@@ -92,7 +177,7 @@ $pageSubtitle = 'Your reviews and ratings';
                     <span class="feedback-item-pkg"><?= htmlspecialchars($fb['package_name']) ?></span>
                     <span class="feedback-item-date">
                         <i class="fa-solid fa-calendar-day"></i>
-                        <?= htmlspecialchars(formatDateReadable($fb['event_date'])) ?>
+                        <?= htmlspecialchars(formatDateReadable($fb['created_at'])) ?>
                         <?php if ($fb['event_type']): ?>
                         &nbsp;·&nbsp; <?= htmlspecialchars($fb['event_type']) ?>
                         <?php endif; ?>
@@ -126,6 +211,8 @@ $pageSubtitle = 'Your reviews and ratings';
         </div><!-- /.feedback-item-card -->
         <?php endforeach; ?>
     </div><!-- /.feedback-item-list -->
+
+    <?php endif; ?>
 
     <?php endif; ?>
 

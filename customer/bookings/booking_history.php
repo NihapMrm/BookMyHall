@@ -54,6 +54,16 @@ try {
     $total    = 0;
 }
 
+// Fetch booking IDs that already have feedback (so we can show the action button correctly)
+$feedbackBookingIds = [];
+try {
+    $fbStmt = $pdo->prepare('SELECT booking_id FROM feedback WHERE customer_id = ?');
+    $fbStmt->execute([$customerId]);
+    $feedbackBookingIds = $fbStmt->fetchAll(PDO::FETCH_COLUMN);
+} catch (PDOException $e) {
+    error_log('booking_history feedback fetch: ' . $e->getMessage());
+}
+
 $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
 
 $pageTitle    = 'Booking History';
@@ -172,8 +182,21 @@ $pageSubtitle = 'View and manage your reservations';
                     </span>
                 </td>
                 <td>
+                    <?php
+                    $hasFeedback = in_array($bk['booking_id'], $feedbackBookingIds, true);
+                    $canLeaveFeedback = !$hasFeedback && in_array($bk['status'], ['completed','approved'], true);
+                    ?>
+
                     <a href="<?= BASE_URL ?>/customer/bookings/booking_details.php?id=<?= (int)$bk['booking_id'] ?>"
                        class="btn btn-outline btn-sm">View</a>
+
+                    <?php if ($canLeaveFeedback): ?>
+                    <a href="<?= BASE_URL ?>/customer/feedback/submit_feedback.php?booking_id=<?= (int)$bk['booking_id'] ?>"
+                       class="btn btn-primary btn-sm" style="margin-top:6px;display:inline-flex;">
+                        <i class="fa-solid fa-star"></i> Leave Feedback
+                    </a>
+                    <?php endif; ?>
+
                     <?php if ($bk['status'] === 'pending'): ?>
                     <a href="<?= BASE_URL ?>/customer/bookings/cancel_booking.php?id=<?= (int)$bk['booking_id'] ?>"
                        class="btn btn-danger btn-sm">Cancel</a>
