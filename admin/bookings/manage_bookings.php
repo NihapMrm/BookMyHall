@@ -241,6 +241,9 @@ $pageSubtitle = 'Manage reservations — calendar and list view';
                        title="From date" style="height:38px;padding:0 12px;border:1.5px solid #e0e4f0;border-radius:var(--radius-sm);font-family:inherit;font-size:.82rem;color:var(--text-main);"/>
                 <input type="date" name="date_to" value="<?= htmlspecialchars($dateTo) ?>"
                        title="To date" style="height:38px;padding:0 12px;border:1.5px solid #e0e4f0;border-radius:var(--radius-sm);font-family:inherit;font-size:.82rem;color:var(--text-main);"/>
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-filter"></i> Filter
+                </button>
                 <a href="<?= BASE_URL ?>/admin/bookings/manage_bookings.php" class="btn btn-outline btn-sm">Clear</a>
             </div>
         </form>

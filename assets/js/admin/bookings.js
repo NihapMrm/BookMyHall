@@ -268,31 +268,6 @@ function initAdminCalendar(bookings) {
         });
     }
 
-    /* ─── Auto filter & search (table view) ─────────────────────────────────── */
-    const filterForm = document.getElementById('filter-form');
-    if (filterForm) {
-        const searchInput = filterForm.querySelector('input[name="q"]');
-        const statusInput = filterForm.querySelector('select[name="status"]');
-        const dateFrom    = filterForm.querySelector('input[name="date_from"]');
-        const dateTo      = filterForm.querySelector('input[name="date_to"]');
-
-        const submitForm = () => filterForm.submit();
-
-        // Auto-submit on change
-        [statusInput, dateFrom, dateTo].forEach(el => {
-            if (el) el.addEventListener('change', submitForm);
-        });
-
-        // Debounced search
-        if (searchInput) {
-            let timer = null;
-            searchInput.addEventListener('input', function () {
-                clearTimeout(timer);
-                timer = setTimeout(submitForm, 300);
-            });
-        }
-    }
-
     render();
 }
 
