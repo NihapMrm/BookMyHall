@@ -1,0 +1,141 @@
+<?php
+/**
+ * my_feedback.php — Customer: view all submitted feedback
+ * Module 4 – Afrina
+ */
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../includes/db_connection.php';
+require_once __DIR__ . '/../../includes/functions.php';
+require_once __DIR__ . '/../../includes/customer_session_guard.php';
+
+$customerId = (int)$_SESSION['customer_id'];
+$flash = getFlash();
+
+$feedbacks = [];
+try {
+    $stmt = $pdo->prepare(
+        "SELECT f.feedback_id, f.rating, f.comment, f.is_visible, f.created_at,
+                b.booking_id, b.event_date, b.event_type,
+                p.name AS package_name
+         FROM feedback f
+         JOIN bookings b ON b.booking_id = f.booking_id
+         JOIN packages p ON p.package_id = b.sub_package_id
+         WHERE f.customer_id = ?
+         ORDER BY f.created_at DESC"
+    );
+    $stmt->execute([$customerId]);
+    $feedbacks = $stmt->fetchAll();
+} catch (PDOException $e) {
+    error_log('my_feedback fetch: ' . $e->getMessage());
+}
+
+$pageTitle    = 'My Feedback';
+$pageSubtitle = 'Your reviews and ratings';
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title><?= $pageTitle ?> — <?= SITE_NAME ?></title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/customer/customer_global.css"/>
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/customer/feedback.css"/>
+</head>
+<body>
+
+<?php include __DIR__ . '/../includes/customer_sidebar.php'; ?>
+<?php include __DIR__ . '/../includes/customer_topbar.php'; ?>
+
+<div class="c-content-wrapper">
+<div class="customer-content">
+
+    <?php if ($flash): ?>
+    <div class="alert alert-<?= htmlspecialchars($flash['type']) ?>" style="margin-bottom:20px;">
+        <i class="fa-solid <?= $flash['type'] === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation' ?>"></i>
+        <?= htmlspecialchars($flash['message']) ?>
+    </div>
+    <?php endif; ?>
+
+    <?php if (empty($feedbacks)): ?>
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);">
+        <i class="fa-solid fa-star" style="font-size:3rem;color:var(--warning);margin-bottom:14px;display:block;opacity:.4;"></i>
+        <p style="font-size:1.05rem;margin-bottom:18px;">You haven't submitted any feedback yet.</p>
+        <a href="<?= BASE_URL ?>/customer/bookings/booking_history.php" class="btn btn-primary">
+            <i class="fa-solid fa-calendar"></i> View My Bookings
+        </a>
+    </div>
+
+    <?php else: ?>
+
+    <div class="feedback-item-list">
+        <?php foreach ($feedbacks as $fb): ?>
+        <div class="feedback-item-card">
+
+            <!-- Left: rating number + stars -->
+            <div class="feedback-item-rating">
+                <div class="feedback-item-big-num"><?= (int)$fb['rating'] ?></div>
+                <div class="feedback-item-stars">
+                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <i class="fa-<?= $i <= (int)$fb['rating'] ? 'solid' : 'regular' ?> fa-star"></i>
+                    <?php endfor; ?>
+                </div>
+                <div class="feedback-item-label">
+                    <?= ['','Poor','Fair','Good','Very Good','Excellent'][(int)$fb['rating']] ?>
+                </div>
+            </div>
+
+            <!-- Middle: booking info + comment -->
+            <div class="feedback-item-body">
+                <div class="feedback-item-meta">
+                    <span class="feedback-item-pkg"><?= htmlspecialchars($fb['package_name']) ?></span>
+                    <span class="feedback-item-date">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        <?= htmlspecialchars(formatDateReadable($fb['event_date'])) ?>
+                        <?php if ($fb['event_type']): ?>
+                        &nbsp;·&nbsp; <?= htmlspecialchars($fb['event_type']) ?>
+                        <?php endif; ?>
+                    </span>
+                </div>
+                <div class="feedback-item-comment">
+                    <?= nl2br(htmlspecialchars($fb['comment'] ?? '')) ?>
+                </div>
+                <div class="feedback-item-submitted">
+                    Submitted on <?= htmlspecialchars(date('M d, Y', strtotime($fb['created_at']))) ?>
+                </div>
+            </div>
+
+            <!-- Right: visibility + booking link -->
+            <div class="feedback-item-actions">
+                <?php if ($fb['is_visible']): ?>
+                <span class="visibility-notice visible">
+                    <i class="fa-solid fa-eye"></i> Visible
+                </span>
+                <?php else: ?>
+                <span class="visibility-notice hidden">
+                    <i class="fa-solid fa-eye-slash"></i> Hidden
+                </span>
+                <?php endif; ?>
+                <a href="<?= BASE_URL ?>/customer/bookings/booking_details.php?id=<?= (int)$fb['booking_id'] ?>"
+                   class="btn btn-outline btn-sm" style="margin-top:8px;">
+                    <i class="fa-solid fa-calendar"></i> View Booking
+                </a>
+            </div>
+
+        </div><!-- /.feedback-item-card -->
+        <?php endforeach; ?>
+    </div><!-- /.feedback-item-list -->
+
+    <?php endif; ?>
+
+</div><!-- /.customer-content -->
+
+<footer class="site-footer">
+    <p>&copy; <?= date('Y') ?> <?= SITE_NAME ?> — Lee Maridean Banquet Hall. All rights reserved.</p>
+</footer>
+</div><!-- /.c-content-wrapper -->
+
+<script src="<?= BASE_URL ?>/assets/js/main.js"></script>
+</body>
+</html>
