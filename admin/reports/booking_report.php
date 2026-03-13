@@ -9,12 +9,17 @@ require_once __DIR__ . '/../../includes/functions.php';
 require_once __DIR__ . '/../../includes/session_guard.php';
 
 // ─── Filters ──────────────────────────────────────────────────────────────────
-$dateFrom = sanitizeInput($_GET['from'] ?? date('Y-m-01'));
-$dateTo   = sanitizeInput($_GET['to']   ?? date('Y-m-d'));
+$dateFrom = sanitizeInput($_GET['from'] ?? '');
+$dateTo   = sanitizeInput($_GET['to']   ?? '');
 
 // ─── Summary stats ─────────────────────────────────────────────────────────────
 $stats = ['total' => 0, 'pending' => 0, 'approved' => 0, 'completed' => 0, 'rejected' => 0, 'cancelled' => 0];
 try {
+    $dateWhere  = '';
+    $dateParams = [];
+    if ($dateFrom !== '') { $dateWhere .= ' AND event_date >= ?'; $dateParams[] = $dateFrom; }
+    if ($dateTo   !== '') { $dateWhere .= ' AND event_date <= ?'; $dateParams[] = $dateTo; }
+
     $row = $pdo->prepare(
         "SELECT COUNT(*) AS total,
                 SUM(status='pending')   AS pending,
@@ -23,9 +28,9 @@ try {
                 SUM(status='rejected')  AS rejected,
                 SUM(status='cancelled') AS cancelled
          FROM bookings
-         WHERE is_deleted = 0 AND event_date BETWEEN ? AND ?"
+         WHERE is_deleted = 0$dateWhere"
     );
-    $row->execute([$dateFrom, $dateTo]);
+    $row->execute($dateParams);
     $r = $row->fetch();
     if ($r) $stats = array_map('intval', $r);
 } catch (PDOException $e) { error_log('booking_report stats: ' . $e->getMessage()); }
@@ -43,10 +48,10 @@ try {
     $etStmt = $pdo->prepare(
         "SELECT event_type, COUNT(*) AS cnt
          FROM bookings
-         WHERE is_deleted = 0 AND event_type IS NOT NULL AND event_date BETWEEN ? AND ?
+         WHERE is_deleted = 0 AND event_type IS NOT NULL$dateWhere
          GROUP BY event_type ORDER BY cnt DESC LIMIT 10"
     );
-    $etStmt->execute([$dateFrom, $dateTo]);
+    $etStmt->execute($dateParams);
     $eventTypes = $etStmt->fetchAll();
 } catch (PDOException $e) { error_log('booking_report event_types: ' . $e->getMessage()); }
 
@@ -56,10 +61,10 @@ try {
     $pdStmt = $pdo->prepare(
         "SELECT event_date, COUNT(*) AS cnt
          FROM bookings
-         WHERE is_deleted = 0 AND event_date BETWEEN ? AND ?
+         WHERE is_deleted = 0$dateWhere
          GROUP BY event_date ORDER BY cnt DESC LIMIT 10"
     );
-    $pdStmt->execute([$dateFrom, $dateTo]);
+    $pdStmt->execute($dateParams);
     $peakDates = $pdStmt->fetchAll();
 } catch (PDOException $e) { error_log('booking_report peak_dates: ' . $e->getMessage()); }
 
@@ -74,10 +79,10 @@ try {
          FROM bookings b
          JOIN users u    ON u.user_id    = b.customer_id
          JOIN packages p ON p.package_id = b.package_id
-         WHERE b.is_deleted = 0 AND b.event_date BETWEEN ? AND ?
+         WHERE b.is_deleted = 0" . ($dateWhere ? str_replace('event_date', 'b.event_date', $dateWhere) : '') . "
          ORDER BY b.event_date ASC"
     );
-    $bkStmt->execute([$dateFrom, $dateTo]);
+    $bkStmt->execute($dateParams);
     $bookings = $bkStmt->fetchAll();
 } catch (PDOException $e) { error_log('booking_report list: ' . $e->getMessage()); }
 
@@ -106,7 +111,15 @@ $pageSubtitle = 'Booking summary for the selected period';
     <!-- Print header (hidden on screen) -->
     <div class="print-header">
         <h1><?= SITE_NAME ?> — Booking Report</h1>
-        <p>Period: <?= htmlspecialchars(formatDateReadable($dateFrom)) ?> to <?= htmlspecialchars(formatDateReadable($dateTo)) ?></p>
+        <p>Period:
+        <?php if ($dateFrom || $dateTo): ?>
+            <?= $dateFrom ? htmlspecialchars(formatDateReadable($dateFrom)) : 'All time' ?>
+            <?= ($dateFrom && $dateTo) ? ' to ' : '' ?>
+            <?= $dateTo ? htmlspecialchars(formatDateReadable($dateTo)) : '' ?>
+        <?php else: ?>
+            All time
+        <?php endif; ?>
+        </p>
     </div>
 
     <!-- Report Nav -->
@@ -114,7 +127,6 @@ $pageSubtitle = 'Booking summary for the selected period';
         <a href="<?= BASE_URL ?>/admin/reports/booking_report.php<?= $_SERVER['QUERY_STRING'] ? '?' . htmlspecialchars($_SERVER['QUERY_STRING']) : '' ?>" class="active"><i class="fa-solid fa-calendar-check"></i> Bookings</a>
         <a href="<?= BASE_URL ?>/admin/reports/income_report.php"><i class="fa-solid fa-sack-dollar"></i> Income</a>
         <a href="<?= BASE_URL ?>/admin/reports/monthly_report.php"><i class="fa-solid fa-table"></i> Monthly</a>
-        <a href="<?= BASE_URL ?>/admin/reports/utilization_report.php"><i class="fa-solid fa-gauge-high"></i> Utilization</a>
         <a href="<?= BASE_URL ?>/admin/reports/customer_report.php"><i class="fa-solid fa-users"></i> Customers</a>
     </nav>
 

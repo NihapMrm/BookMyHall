@@ -148,7 +148,6 @@ $pageSubtitle = 'Customer registrations, activity, and spending statistics';
         <a href="<?= BASE_URL ?>/admin/reports/booking_report.php"><i class="fa-solid fa-calendar-check"></i> Bookings</a>
         <a href="<?= BASE_URL ?>/admin/reports/income_report.php"><i class="fa-solid fa-sack-dollar"></i> Income</a>
         <a href="<?= BASE_URL ?>/admin/reports/monthly_report.php"><i class="fa-solid fa-table"></i> Monthly</a>
-        <a href="<?= BASE_URL ?>/admin/reports/utilization_report.php"><i class="fa-solid fa-gauge-high"></i> Utilization</a>
         <a href="<?= BASE_URL ?>/admin/reports/customer_report.php" class="active"><i class="fa-solid fa-users"></i> Customers</a>
     </nav>
 

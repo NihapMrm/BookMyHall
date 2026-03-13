@@ -16,7 +16,7 @@
     --radius-lg:     20px;
     --radius-md:     14px;
     --radius-sm:     10px;
-    --nav-height:    68px;
+    --nav-height:    86px;
 }
 
 /* ─── Base ───────────────────────────────────────────────────────────────────── */
@@ -447,4 +447,12 @@ table.data-table tbody tr:hover { background: #f9faff; }
     .customer-sidebar { display: none; }
     .customer-topbar  { left: 0; }
     .c-content-wrapper { margin-left: 0; }
+}
+
+
+.packages-section {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+
 }
