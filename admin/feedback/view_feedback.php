@@ -8,6 +8,33 @@ require_once __DIR__ . '/../../includes/db_connection.php';
 require_once __DIR__ . '/../../includes/functions.php';
 require_once __DIR__ . '/../../includes/session_guard.php';
 
+// Auto-migrate: create feedback table if missing
+try {
+    $tableCheck = $pdo->query(
+        "SELECT COUNT(*) FROM information_schema.tables
+         WHERE table_schema = DATABASE() AND table_name = 'feedback'"
+    );
+    if ((int)$tableCheck->fetchColumn() === 0) {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS `feedback` (
+                `feedback_id`  INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+                `booking_id`   INT UNSIGNED  NOT NULL,
+                `customer_id`  INT UNSIGNED  NOT NULL,
+                `rating`       TINYINT UNSIGNED NOT NULL DEFAULT 5 COMMENT '1–5 stars',
+                `comment`      TEXT          DEFAULT NULL,
+                `is_visible`   TINYINT(1)    NOT NULL DEFAULT 1,
+                `created_at`   DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (`feedback_id`),
+                UNIQUE KEY `uq_booking_feedback` (`booking_id`),
+                FOREIGN KEY (`booking_id`)  REFERENCES `bookings`(`booking_id`) ON DELETE CASCADE,
+                FOREIGN KEY (`customer_id`) REFERENCES `users`(`user_id`)       ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        ");
+    }
+} catch (PDOException $e) {
+    error_log('view_feedback migration: ' . $e->getMessage());
+}
+
 $feedbackId = (int)($_GET['id'] ?? 0);
 if ($feedbackId <= 0) {
     redirect(BASE_URL . '/admin/feedback/manage_feedback.php');
