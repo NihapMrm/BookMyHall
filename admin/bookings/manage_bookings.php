@@ -100,7 +100,7 @@ try {
     $totalRows  = (int)$countStmt->fetchColumn();
     $totalPages = (int)ceil($totalRows / $perPage);
 
-    $sql = "SELECT b.booking_id, b.event_date, b.start_time, b.end_time,
+    $sql = "SELECT b.booking_id, b.event_date, COALESCE(b.end_date, b.event_date) AS end_date, b.start_time, b.end_time,
                    b.event_type, b.guest_count, b.status,
                    b.total_amount, b.advance_amount, b.balance_amount, b.created_at,
                    u.full_name AS customer_name, u.email AS customer_email,
@@ -265,7 +265,8 @@ $pageSubtitle = 'Manage reservations — calendar and list view';
                             <th>#ID</th>
                             <th>Customer</th>
                             <th>Package</th>
-                            <th>Event Date</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
                             <th>Time</th>
                             <th>Guests</th>
                             <th>Total</th>
@@ -292,6 +293,9 @@ $pageSubtitle = 'Manage reservations — calendar and list view';
                             <td style="font-size:.85rem;"><?= htmlspecialchars($bk['package_name']) ?></td>
                             <td style="font-size:.85rem;white-space:nowrap;">
                                 <?= htmlspecialchars(formatDateReadable($bk['event_date'])) ?>
+                            </td>
+                            <td style="font-size:.85rem;white-space:nowrap;">
+                                <?= htmlspecialchars(formatDateReadable($bk['end_date'])) ?>
                             </td>
                             <td style="font-size:.82rem;white-space:nowrap;color:var(--text-muted);">
                                 <?= htmlspecialchars(substr($bk['start_time'],0,5)) ?>–<?= htmlspecialchars(substr($bk['end_time'],0,5)) ?>

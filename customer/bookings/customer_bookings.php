@@ -14,7 +14,7 @@ $customerId = (int)$_SESSION['customer_id'];
 $bookings = [];
 try {
     $stmt = $pdo->prepare(
-        "SELECT b.booking_id, b.event_date, b.end_date, b.start_time, b.end_time,
+        "SELECT b.booking_id, b.event_date, COALESCE(b.end_date, b.event_date) AS end_date, b.start_time, b.end_time,
                 b.status, b.event_type, b.guest_count,
                 p.name AS package_name
          FROM bookings b
@@ -32,15 +32,16 @@ try {
 $calendarData = [];
 foreach ($bookings as $bk) {
     $startDate = $bk['event_date'];
-    $endDate   = $bk['end_date'] ?: $bk['event_date'];
+    $endDate   = $bk['end_date'];
 
-    $cur = new DateTime($startDate);
-    $end = new DateTime($endDate);
+    $startTs = strtotime($startDate);
+    $endTs = strtotime($endDate);
 
-    while ($cur <= $end) {
+    for ($ts = $startTs; $ts <= $endTs; $ts += 86400) {
+        $date = date('Y-m-d', $ts);
         $calendarData[] = [
             'id'           => (int)$bk['booking_id'],
-            'event_date'   => $cur->format('Y-m-d'),
+            'event_date'   => $date,
             'status'       => $bk['status'],
             'package_name' => $bk['package_name'],
             'event_type'   => $bk['event_type'] ?? '',
@@ -48,7 +49,6 @@ foreach ($bookings as $bk) {
             'end_time'     => date('g:i A', strtotime($bk['end_time'])),
             'detail_url'   => BASE_URL . '/customer/bookings/booking_details.php?id=' . $bk['booking_id'],
         ];
-        $cur->modify('+1 day');
     }
 }
 $jsonBookings = json_encode(array_values($calendarData), JSON_HEX_TAG | JSON_HEX_AMP);

@@ -34,7 +34,7 @@ try {
     // Bookings
     $dataParams = array_merge($params, [$perPage, $offset]);
     $stmt = $pdo->prepare(
-        "SELECT b.booking_id, b.event_date, b.end_date, b.start_time, b.end_time,
+        "SELECT b.booking_id, b.event_date, COALESCE(b.end_date, b.event_date) AS end_date, b.start_time, b.end_time,
                 b.event_type, b.guest_count, b.status,
                 b.total_amount, b.advance_amount, b.balance_amount, b.created_at,
                 p.name AS package_name,
